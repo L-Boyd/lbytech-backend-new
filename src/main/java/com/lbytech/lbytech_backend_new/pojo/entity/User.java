@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 public class User {
     // 主键
-    private Long id;
+    private Integer id;
 
     // 邮箱
     private String email;
