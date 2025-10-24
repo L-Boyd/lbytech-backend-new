@@ -21,5 +21,18 @@ spring:
     port: ${MAIL_PORT:465}
     username: ${MAIL_USERNAME:123@163.com}
     password: ${MAIL_PASSWORD:1234}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
+            fallback: false
+            port: 465
+          ssl:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
 
 
