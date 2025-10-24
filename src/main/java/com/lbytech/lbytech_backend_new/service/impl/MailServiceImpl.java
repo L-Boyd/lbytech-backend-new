@@ -46,7 +46,7 @@ public class MailServiceImpl implements IMailService {
     @Override
     public void sendVerifyCodeEmail(String toEmail, String verifyCode) {
         try {
-            String subject = "【LBytech】邮箱验证码";
+            String subject = "【LBYtech】邮箱验证码";
             String content = buildVerifyCodeContent(verifyCode);
 
             sendHtmlMail(toEmail, subject, content);
