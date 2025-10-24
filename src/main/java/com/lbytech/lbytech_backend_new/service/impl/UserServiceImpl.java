@@ -2,6 +2,10 @@ package com.lbytech.lbytech_backend_new.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lbytech.lbytech_backend_new.mapper.UserMapper;
+import com.lbytech.lbytech_backend_new.pojo.entity.User;
 import com.lbytech.lbytech_backend_new.service.IMailService;
 import com.lbytech.lbytech_backend_new.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
-public class UserServiceImpl implements IUserService {
+public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
 
     @Autowired
     private IMailService mailService;
@@ -79,6 +83,26 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public boolean userRegister(String email, String password, String verifyCode) {
+        User user = this.lambdaQuery().eq(User::getEmail, email).one();
+        if (user != null) {
+            log.error("邮箱 {} 已注册", email);
+            return false;
+        }
+
+        // 校验验证码
+        String cachedVerifyCode = stringRedisTemplate.opsForValue().get(email);
+        if (StrUtil.isBlank(cachedVerifyCode) || !cachedVerifyCode.equals(verifyCode)) {
+            log.error("验证码错误或过期");
+            return false;
+        }
+
+        // 创建用户
+        user = new User(email, password);
+        this.save(user);
+
+        // 注册成功后，删除Redis中的验证码
+        stringRedisTemplate.delete(email);
+
         return true;
     }
 
