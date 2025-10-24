@@ -1,0 +1,4 @@
+spring:
+  application:
+    name: lbytech_backend_new
+
