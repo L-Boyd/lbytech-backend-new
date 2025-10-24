@@ -35,4 +35,7 @@ spring:
           timeout: 5000
           writetimeout: 5000
 
-
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # ??SQL??
+    map-underscore-to-camel-case: true # ????????
