@@ -6,7 +6,10 @@ import com.lbytech.lbytech_backend_new.service.IMailService;
 import com.lbytech.lbytech_backend_new.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -14,6 +17,9 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private IMailService mailService;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     /**
      * 发送验证码
@@ -28,8 +34,18 @@ public class UserServiceImpl implements IUserService {
             return false;
         }
 
+        // 从Redis中获取验证码
+        String cachedVerifyCode = stringRedisTemplate.opsForValue().get(email);
+        if (StrUtil.isNotBlank(cachedVerifyCode)) {
+            log.error("邮箱 {} 已发送验证码，5分钟内不能重复发送", email);
+            return false;
+        }
+
         // 生成6位验证码
         String verifyCode = RandomUtil.randomNumbers(6);
+
+        // 缓存验证码，过期时间为5分钟
+        stringRedisTemplate.opsForValue().set(email, verifyCode, 5, TimeUnit.MINUTES);
 
         // 发送验证码邮件
         mailService.sendVerifyCodeEmail(email, verifyCode);
