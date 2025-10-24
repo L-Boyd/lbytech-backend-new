@@ -16,4 +16,10 @@ spring:
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:1234}
 
+  mail:
+    host: ${MAIL_HOST:smtp.163.com}
+    port: ${MAIL_PORT:465}
+    username: ${MAIL_USERNAME:123@163.com}
+    password: ${MAIL_PASSWORD:1234}
+
 
