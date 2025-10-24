@@ -1,5 +1,9 @@
 package com.lbytech.lbytech_backend_new.pojo.Enum;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
+import java.util.HashMap;
+
 /**
  * 状态码枚举类
  */
@@ -13,5 +17,14 @@ public enum StatusCodeEnum {
         StatusCodeEnum(int code, String message) {
             this.code = code;
             this.message = message;
+        }
+
+        // 使用@JsonValue注解，让枚举序列化为Map对象
+        @JsonValue
+        public Object toJson() {
+            return new HashMap<String, Object>() {{
+                put("code", code);
+                put("message", message);
+            }};
         }
 }
