@@ -1,5 +1,6 @@
 package com.lbytech.lbytech_backend_new.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
@@ -7,10 +8,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lbytech.lbytech_backend_new.mapper.UserMapper;
 import com.lbytech.lbytech_backend_new.pojo.entity.User;
+import com.lbytech.lbytech_backend_new.pojo.vo.UserVO;
 import com.lbytech.lbytech_backend_new.service.IMailService;
 import com.lbytech.lbytech_backend_new.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -110,4 +113,46 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return true;
     }
 
+    @Override
+    public UserVO loginByVerifyCode(String email, String verifyCode) {
+        User user = this.lambdaQuery().eq(User::getEmail, email).one();
+        if (user == null) {
+            boolean result = userRegister(email, "0000", verifyCode);
+            if (!result) {
+                return null;
+            }
+            user = this.lambdaQuery().eq(User::getEmail, email).one();
+            UserVO userVO = new UserVO();
+            BeanUtil.copyProperties(user, userVO);
+            return userVO;
+        } else {
+            String cachedVerifyCode = stringRedisTemplate.opsForValue().get(email);
+            if (StrUtil.isBlank(cachedVerifyCode) || !cachedVerifyCode.equals(verifyCode)) {
+                log.error("邮箱 {} 验证码错误或过期", email);
+                return null;
+            }
+            UserVO userVO = new UserVO();
+            BeanUtil.copyProperties(user, userVO);
+            // 登录成功后，删除Redis中的验证码
+            stringRedisTemplate.delete(email);
+            return userVO;
+        }
+    }
+
+    @Override
+    public UserVO loginByPassword(String email, String password) {
+        User user = this.lambdaQuery().eq(User::getEmail, email).one();
+        if (user == null) {
+            log.error("邮箱 {} 未注册", email);
+            return null;
+        }
+        String encryptPassword = DigestUtil.md5Hex(password + SALT);
+        if (!encryptPassword.equals(user.getPassword())) {
+            log.error("邮箱 {} 密码错误", email);
+            return null;
+        }
+        UserVO userVO = new UserVO();
+        BeanUtil.copyProperties(user, userVO);
+        return userVO;
+    }
 }

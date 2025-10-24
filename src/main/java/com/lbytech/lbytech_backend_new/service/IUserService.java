@@ -1,6 +1,8 @@
 package com.lbytech.lbytech_backend_new.service;
 
 
+import com.lbytech.lbytech_backend_new.pojo.vo.UserVO;
+
 public interface IUserService {
 
         /**
@@ -19,6 +21,24 @@ public interface IUserService {
          * @return
          */
         boolean userRegister(String email, String password, String verifyCode);
+
+        /**
+         * 用验证码登录
+         *
+         * @param email
+         * @param password
+         * @return
+         */
+        UserVO loginByVerifyCode(String email, String password);
+
+         /**
+          * 用密码登录
+          *
+          * @param email
+          * @param password
+          * @return
+          */
+        UserVO loginByPassword(String email, String password);
 
 
 }
