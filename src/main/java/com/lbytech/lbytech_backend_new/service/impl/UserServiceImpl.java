@@ -2,6 +2,7 @@ package com.lbytech.lbytech_backend_new.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lbytech.lbytech_backend_new.mapper.UserMapper;
@@ -24,6 +25,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
+    private final String SALT = "lbytech";
 
     /**
      * 发送验证码
@@ -53,7 +56,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         // 发送验证码邮件
         mailService.sendVerifyCodeEmail(email, verifyCode);
-        log.info("验证码已发送到邮箱: {}", email);
+        log.info("验证码已发送到邮箱: {},验证码为: {}", email, verifyCode);
 
         return true;
     }
@@ -97,7 +100,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
 
         // 创建用户
-        user = new User(email, password);
+        String encryptPassword = DigestUtil.md5Hex(password + SALT);
+        user = new User(email, encryptPassword);
         this.save(user);
 
         // 注册成功后，删除Redis中的验证码
