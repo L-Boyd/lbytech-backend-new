@@ -1,5 +1,7 @@
 package com.lbytech.lbytech_backend_new.pojo.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -8,7 +10,8 @@ import lombok.Data;
  */
 @Data
 public class User {
-    // 主键
+    // 主键，使用数据库自增
+    @TableId(type = IdType.AUTO)
     private Integer id;
 
     // 邮箱
@@ -17,8 +20,8 @@ public class User {
     // 密码
     private String password;
 
-    public User(String password, String email) {
-        this.password = password;
+    public User(String email, String password) {
         this.email = email;
+        this.password = password;
     }
 }
