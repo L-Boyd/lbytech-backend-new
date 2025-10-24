@@ -30,7 +30,10 @@ public class UserController {
         if (StrUtil.isBlank(email)) {
             return ResultUtil.fail("邮箱不能为空");
         }
-        userService.sendVerifyCode(email);
+        boolean result = userService.sendVerifyCode(email);
+        if (!result) {
+            return ResultUtil.fail("验证码发送失败");
+        }
         return ResultUtil.success("验证码发送成功");
     }
 
