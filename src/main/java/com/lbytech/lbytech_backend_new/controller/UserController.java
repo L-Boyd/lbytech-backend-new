@@ -3,6 +3,7 @@ package com.lbytech.lbytech_backend_new.controller;
 import cn.hutool.core.util.StrUtil;
 import com.lbytech.lbytech_backend_new.exception.BusinessException;
 import com.lbytech.lbytech_backend_new.pojo.Enum.StatusCodeEnum;
+import com.lbytech.lbytech_backend_new.pojo.dto.ChangePasswordFrom;
 import com.lbytech.lbytech_backend_new.pojo.dto.SendVerifyCodeForm;
 import com.lbytech.lbytech_backend_new.pojo.dto.UserLoginFrom;
 import com.lbytech.lbytech_backend_new.pojo.dto.UserRegisterFrom;
@@ -88,14 +89,14 @@ public class UserController {
     /**
      * 更改密码
      *
-     * @param userLoginFrom
+     * @param changePasswordFrom
      * @return
      */
     @PostMapping("/changePassword")
-    public BaseResponse<String> changePassword(@RequestBody UserLoginFrom userLoginFrom) {
-        String email = userLoginFrom.getEmail();
-        String verifyCode = userLoginFrom.getVerifyCode();
-        String newPassword = userLoginFrom.getPassword();
+    public BaseResponse<String> changePassword(@RequestBody ChangePasswordFrom changePasswordFrom) {
+        String email = changePasswordFrom.getEmail();
+        String verifyCode = changePasswordFrom.getVerifyCode();
+        String newPassword = changePasswordFrom.getNewPassword();
         if (StrUtil.hasBlank(email, verifyCode, newPassword)) {
             throw new BusinessException(StatusCodeEnum.FAIL, "参数不能为空");
         }

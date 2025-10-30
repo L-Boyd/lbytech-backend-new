@@ -159,6 +159,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             log.error("验证码错误或过期");
             throw new BusinessException(StatusCodeEnum.FAIL, "验证码错误或过期");
         }
+        User user = this.lambdaQuery().eq(User::getEmail, email).one();
+        if (user == null) {
+            log.error("邮箱 {} 未注册", email);
+            throw new BusinessException(StatusCodeEnum.FAIL, "邮箱未注册");
+        }
         // 更新密码
         String encryptPassword = DigestUtil.md5Hex(newPassword + SALT);
         this.lambdaUpdate().set(User::getPassword, encryptPassword).eq(User::getEmail, email).update();
