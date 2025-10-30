@@ -26,4 +26,16 @@ public class ResultUtil {
         public static <T> BaseResponse<T> fail(T data) {
             return new BaseResponse<>(StatusCodeEnum.FAIL, data);
         }
+
+        /**
+         * 失败
+         *
+         * @param code
+         * @param data
+         * @param <T>
+         * @return
+         */
+        public static <T> BaseResponse<T> fail(StatusCodeEnum code, T data) {
+            return new BaseResponse<>(code, data);
+        }
 }
