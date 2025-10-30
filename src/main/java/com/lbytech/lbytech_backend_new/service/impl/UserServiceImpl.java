@@ -150,4 +150,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         BeanUtil.copyProperties(user, userVO);
         return userVO;
     }
+
+    @Override
+    public void changePassword(String email, String verifyCode, String newPassword) {
+        // 校验验证码
+        String cachedVerifyCode = stringRedisTemplate.opsForValue().get(email);
+        if (StrUtil.isBlank(cachedVerifyCode) || !cachedVerifyCode.equals(verifyCode)) {
+            log.error("验证码错误或过期");
+            throw new BusinessException(StatusCodeEnum.FAIL, "验证码错误或过期");
+        }
+        // 更新密码
+        String encryptPassword = DigestUtil.md5Hex(newPassword + SALT);
+        this.lambdaUpdate().set(User::getPassword, encryptPassword).eq(User::getEmail, email).update();
+        // 更改成功后删除Redis中的验证码
+        stringRedisTemplate.delete(email);
+    }
 }

@@ -83,6 +83,23 @@ public class UserController {
         String password = userLoginFrom.getPassword();
         UserVO userVO = userService.loginByPassword(email, password);
         return ResultUtil.success(userVO);
+    }
 
+    /**
+     * 更改密码
+     *
+     * @param userLoginFrom
+     * @return
+     */
+    @PostMapping("/changePassword")
+    public BaseResponse<String> changePassword(@RequestBody UserLoginFrom userLoginFrom) {
+        String email = userLoginFrom.getEmail();
+        String verifyCode = userLoginFrom.getVerifyCode();
+        String newPassword = userLoginFrom.getPassword();
+        if (StrUtil.hasBlank(email, verifyCode, newPassword)) {
+            throw new BusinessException(StatusCodeEnum.FAIL, "参数不能为空");
+        }
+        userService.changePassword(email, verifyCode, newPassword);
+        return ResultUtil.success("密码更改成功");
     }
 }

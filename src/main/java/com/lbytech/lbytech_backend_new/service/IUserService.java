@@ -40,5 +40,13 @@ public interface IUserService {
           */
         UserVO loginByPassword(String email, String password);
 
+        /**
+         * 更改密码
+         *
+         * @param email
+         * @param verifyCode
+         * @param newPassword
+         */
+        void changePassword(String email, String verifyCode, String newPassword);
 
 }
