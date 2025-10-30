@@ -68,9 +68,6 @@ public class UserController {
         String email = userLoginFrom.getEmail();
         String password = userLoginFrom.getVerifyCode();
         UserVO userVO = userService.loginByVerifyCode(email, password);
-        if (userVO == null) {
-            return ResultUtil.fail(null);
-        }
         return ResultUtil.success(userVO);
     }
 

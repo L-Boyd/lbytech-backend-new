@@ -124,7 +124,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             String cachedVerifyCode = stringRedisTemplate.opsForValue().get(email);
             if (StrUtil.isBlank(cachedVerifyCode) || !cachedVerifyCode.equals(verifyCode)) {
                 log.error("邮箱 {} 验证码错误或过期", email);
-                return null;
+                throw new BusinessException(StatusCodeEnum.FAIL, "邮箱验证码错误或过期");
             }
             UserVO userVO = new UserVO();
             BeanUtil.copyProperties(user, userVO);
