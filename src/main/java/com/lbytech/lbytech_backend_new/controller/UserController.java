@@ -1,6 +1,8 @@
 package com.lbytech.lbytech_backend_new.controller;
 
 import cn.hutool.core.util.StrUtil;
+import com.lbytech.lbytech_backend_new.exception.BusinessException;
+import com.lbytech.lbytech_backend_new.pojo.Enum.StatusCodeEnum;
 import com.lbytech.lbytech_backend_new.pojo.dto.SendVerifyCodeForm;
 import com.lbytech.lbytech_backend_new.pojo.dto.UserLoginFrom;
 import com.lbytech.lbytech_backend_new.pojo.dto.UserRegisterFrom;
@@ -31,12 +33,9 @@ public class UserController {
     public BaseResponse<String> sendVerifyCode(@RequestBody SendVerifyCodeForm sendVerifyCodeForm) {
         String email = sendVerifyCodeForm.getEmail();
         if (StrUtil.isBlank(email)) {
-            return ResultUtil.fail("邮箱不能为空");
+            throw new BusinessException(StatusCodeEnum.FAIL, "邮箱不能为空");
         }
-        boolean result = userService.sendVerifyCode(email);
-        if (!result) {
-            return ResultUtil.fail("验证码发送失败");
-        }
+        userService.sendVerifyCode(email);
         return ResultUtil.success("验证码发送成功");
     }
 

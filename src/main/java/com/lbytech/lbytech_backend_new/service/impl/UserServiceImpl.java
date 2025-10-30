@@ -6,7 +6,9 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lbytech.lbytech_backend_new.exception.BusinessException;
 import com.lbytech.lbytech_backend_new.mapper.UserMapper;
+import com.lbytech.lbytech_backend_new.pojo.Enum.StatusCodeEnum;
 import com.lbytech.lbytech_backend_new.pojo.entity.User;
 import com.lbytech.lbytech_backend_new.pojo.vo.UserVO;
 import com.lbytech.lbytech_backend_new.service.IMailService;
@@ -37,18 +39,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
      * @param email
      */
     @Override
-    public boolean sendVerifyCode(String email) {
+    public void sendVerifyCode(String email) {
         // 验证邮箱格式
         if (!isValidEmail(email)) {
             log.error("邮箱格式错误: {}", email);
-            return false;
+            throw new BusinessException(StatusCodeEnum.FAIL, "邮箱格式错误");
         }
 
         // 从Redis中获取验证码
         String cachedVerifyCode = stringRedisTemplate.opsForValue().get(email);
         if (StrUtil.isNotBlank(cachedVerifyCode)) {
             log.error("邮箱 {} 已发送验证码，5分钟内不能重复发送", email);
-            return false;
+            throw new BusinessException(StatusCodeEnum.FAIL, "该邮箱已发送验证码，5分钟内不能重复发送");
         }
 
         // 生成6位验证码
@@ -60,8 +62,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 发送验证码邮件
         mailService.sendVerifyCodeEmail(email, verifyCode);
         log.info("验证码已发送到邮箱: {},验证码为: {}", email, verifyCode);
-
-        return true;
     }
 
     /**

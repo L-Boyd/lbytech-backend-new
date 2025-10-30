@@ -10,7 +10,7 @@ public interface IUserService {
          *
          * @param email
          */
-        boolean sendVerifyCode(String email);
+        void sendVerifyCode(String email);
 
         /**
          * 用户注册
