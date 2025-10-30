@@ -20,7 +20,7 @@ public interface IUserService {
          * @param verifyCode
          * @return
          */
-        boolean userRegister(String email, String password, String verifyCode);
+        void userRegister(String email, String password, String verifyCode);
 
         /**
          * 用验证码登录

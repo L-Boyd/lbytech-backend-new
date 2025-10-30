@@ -51,12 +51,9 @@ public class UserController {
         String password = userRegisterFrom.getPassword();
         String verifyCode = userRegisterFrom.getVerifyCode();
         if (StrUtil.hasBlank(email, password, verifyCode)) {
-            return ResultUtil.fail("参数不能为空");
+            throw new BusinessException(StatusCodeEnum.FAIL, "参数不能为空");
         }
-        boolean result = userService.userRegister(email, password, verifyCode);
-        if (!result) {
-            return ResultUtil.fail("注册失败");
-        }
+        userService.userRegister(email, password, verifyCode);
         return ResultUtil.success("注册成功");
     }
 

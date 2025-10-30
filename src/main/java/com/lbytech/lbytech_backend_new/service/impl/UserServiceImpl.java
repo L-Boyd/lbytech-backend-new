@@ -88,18 +88,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
      * @return
      */
     @Override
-    public boolean userRegister(String email, String password, String verifyCode) {
+    public void userRegister(String email, String password, String verifyCode) {
         User user = this.lambdaQuery().eq(User::getEmail, email).one();
         if (user != null) {
             log.error("邮箱 {} 已注册", email);
-            return false;
+            throw new BusinessException(StatusCodeEnum.FAIL, "邮箱已注册");
         }
 
         // 校验验证码
         String cachedVerifyCode = stringRedisTemplate.opsForValue().get(email);
         if (StrUtil.isBlank(cachedVerifyCode) || !cachedVerifyCode.equals(verifyCode)) {
             log.error("验证码错误或过期");
-            return false;
+            throw new BusinessException(StatusCodeEnum.FAIL, "验证码错误或过期");
         }
 
         // 创建用户
@@ -109,18 +109,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         // 注册成功后，删除Redis中的验证码
         stringRedisTemplate.delete(email);
-
-        return true;
     }
 
     @Override
     public UserVO loginByVerifyCode(String email, String verifyCode) {
         User user = this.lambdaQuery().eq(User::getEmail, email).one();
         if (user == null) {
-            boolean result = userRegister(email, "0000", verifyCode);
-            if (!result) {
-                return null;
-            }
+            userRegister(email, RandomUtil.randomString(10), verifyCode);
             user = this.lambdaQuery().eq(User::getEmail, email).one();
             UserVO userVO = new UserVO();
             BeanUtil.copyProperties(user, userVO);
