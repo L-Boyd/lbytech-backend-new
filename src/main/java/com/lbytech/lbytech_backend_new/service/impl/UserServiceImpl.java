@@ -139,12 +139,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         User user = this.lambdaQuery().eq(User::getEmail, email).one();
         if (user == null) {
             log.error("邮箱 {} 未注册", email);
-            return null;
+            throw new BusinessException(StatusCodeEnum.FAIL, "邮箱未注册或密码错误");
         }
         String encryptPassword = DigestUtil.md5Hex(password + SALT);
         if (!encryptPassword.equals(user.getPassword())) {
             log.error("邮箱 {} 密码错误", email);
-            return null;
+            throw new BusinessException(StatusCodeEnum.FAIL, "邮箱未注册或密码错误");
         }
         UserVO userVO = new UserVO();
         BeanUtil.copyProperties(user, userVO);

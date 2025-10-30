@@ -82,9 +82,6 @@ public class UserController {
         String email = userLoginFrom.getEmail();
         String password = userLoginFrom.getPassword();
         UserVO userVO = userService.loginByPassword(email, password);
-        if (userVO == null) {
-            return ResultUtil.fail(null);
-        }
         return ResultUtil.success(userVO);
 
     }
