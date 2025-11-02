@@ -10,7 +10,7 @@ create table User
 )
     comment '用户表';
 
-create table file
+create table notebook
 (
     id          int      auto_increment comment '笔记id'
         primary key,
