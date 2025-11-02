@@ -39,3 +39,9 @@ mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # ??SQL??
     map-underscore-to-camel-case: true # ????????
+ali:
+  oss:
+    endpoint: ${ALI_OSS_ENDPOINT:oss-cn-beijing.aliyuncs.com}
+    accessKeyID: ${ALI_OSS_ACCESS_KEY_ID:xxx}
+    accessKeySecret: ${ALI_OSS_ACCESS_KEY_SECRET:xxx}
+    bucketName: ${ALI_OSS_BUCKET_NAME:xxx}
