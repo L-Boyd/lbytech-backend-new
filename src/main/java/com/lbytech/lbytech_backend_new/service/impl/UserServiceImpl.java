@@ -19,6 +19,7 @@ import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -104,7 +105,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         // 创建用户
         String encryptPassword = DigestUtil.md5Hex(password + SALT);
-        user = new User(email, encryptPassword);
+        user = new User(email, encryptPassword, LocalDateTime.now());
         this.save(user);
 
         // 注册成功后，删除Redis中的验证码
