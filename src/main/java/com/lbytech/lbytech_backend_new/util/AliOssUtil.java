@@ -47,4 +47,30 @@ public class AliOssUtil {
         return url;
 
     }
+
+    /**
+     * 上传文件到OSS，自定义文件名
+     * @param file 文件
+     * @return 文件URL
+     */
+    public String uploadFile(MultipartFile file, String fileName) {
+
+        // OSS客户端
+        OSS ossClient = new OSSClientBuilder()
+                .build(endpoint, accessKeyID, accessKeySecret);
+        // 上传文件
+        try {
+            ossClient.putObject(bucketName, fileName, file.getInputStream());
+        } catch (Exception e) {
+            throw new BusinessException(StatusCodeEnum.FAIL, "文件上传失败");
+        } finally {
+            // 关闭OSS客户端
+            ossClient.shutdown();
+        }
+        // 返回文件URL
+        String url = "https://" + bucketName + "." + endpoint + "/" + file.getOriginalFilename();
+        log.info("文件上传成功，URL为：{}", url);
+        return url;
+
+    }
 }
