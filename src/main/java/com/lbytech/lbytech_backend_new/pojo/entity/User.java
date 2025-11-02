@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 /**
  * 用户实体类
  */
@@ -20,8 +22,12 @@ public class User {
     // 密码
     private String password;
 
-    public User(String email, String password) {
+    // 创建时间
+    private LocalDateTime createTime;
+
+    public User(String email, String password, LocalDateTime createTime) {
         this.email = email;
         this.password = password;
+        this.createTime = createTime;
     }
 }
