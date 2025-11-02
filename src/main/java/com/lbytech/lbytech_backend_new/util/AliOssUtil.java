@@ -2,6 +2,8 @@ package com.lbytech.lbytech_backend_new.util;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
+import com.lbytech.lbytech_backend_new.exception.BusinessException;
+import com.lbytech.lbytech_backend_new.pojo.Enum.StatusCodeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -25,15 +27,20 @@ public class AliOssUtil {
      * @param file 文件
      * @return 文件URL
      */
-    public String uploadFile(MultipartFile file) throws Exception {
+    public String uploadFile(MultipartFile file) {
 
         // OSS客户端
         OSS ossClient = new OSSClientBuilder()
                 .build(endpoint, accessKeyID, accessKeySecret);
         // 上传文件
-        ossClient.putObject(bucketName, file.getOriginalFilename(), file.getInputStream());
-        // 关闭OSS客户端
-        ossClient.shutdown();
+        try {
+            ossClient.putObject(bucketName, file.getOriginalFilename(), file.getInputStream());
+        } catch (Exception e) {
+            throw new BusinessException(StatusCodeEnum.FAIL, "文件上传失败");
+        } finally {
+            // 关闭OSS客户端
+            ossClient.shutdown();
+        }
         // 返回文件URL
         String url = "https://" + bucketName + "." + endpoint + "/" + file.getOriginalFilename();
         log.info("文件上传成功，URL为：{}", url);
