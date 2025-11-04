@@ -72,7 +72,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/loginByVerifyCode")
-    public BaseResponse<UserVO> login(@RequestBody UserLoginFrom userLoginFrom) {
+    public BaseResponse<UserVO> loginByVerifyCode(@RequestBody UserLoginFrom userLoginFrom) {
         String email = userLoginFrom.getEmail();
         String password = userLoginFrom.getVerifyCode();
         UserVO userVO = userService.loginByVerifyCode(email, password);
