@@ -11,6 +11,9 @@ import com.lbytech.lbytech_backend_new.pojo.vo.BaseResponse;
 import com.lbytech.lbytech_backend_new.pojo.vo.UserVO;
 import com.lbytech.lbytech_backend_new.service.IUserService;
 import com.lbytech.lbytech_backend_new.util.ResultUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/user")
+@Tag(name = "用户模块", description = "用户相关API")    // springdoc描述类
 public class UserController {
 
     @Autowired
@@ -31,7 +35,10 @@ public class UserController {
      * @return
      */
     @PostMapping("/sendVerifyCode")
-    public BaseResponse<String> sendVerifyCode(@RequestBody SendVerifyCodeForm sendVerifyCodeForm) {
+    @Operation(summary = "发送验证码", description = "发送验证码到用户邮箱")   // springdoc描述方法
+    public BaseResponse<String> sendVerifyCode(
+            @Parameter(description = "发送验证码表单")
+            @RequestBody SendVerifyCodeForm sendVerifyCodeForm) {
         String email = sendVerifyCodeForm.getEmail();
         if (StrUtil.isBlank(email)) {
             throw new BusinessException(StatusCodeEnum.FAIL, "邮箱不能为空");
