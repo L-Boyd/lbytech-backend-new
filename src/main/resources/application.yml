@@ -45,3 +45,34 @@ ali:
     accessKeyID: ${ALI_OSS_ACCESS_KEY_ID:xxx}
     accessKeySecret: ${ALI_OSS_ACCESS_KEY_SECRET:xxx}
     bucketName: ${ALI_OSS_BUCKET_NAME:xxx}
+
+# springdoc-openapi项目配置
+springdoc:
+  swagger-ui:
+    # swagger-ui 访问路径
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    enable: true
+  api-docs:
+    # OpenAPI JSON端点 路径
+    path: /v3/api-docs
+    enabled: true
+  # 分组配置
+  group-configs:
+    - group: 'user'
+      paths-to-match: '/user/**'
+    - group: 'notebook'
+      paths-to-match: '/notebook/**'
+# knife4j的增强配置，不需要增强可以不配
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+    enable-group: true
+    enable-search: true
+  # Http验证
+  basic:
+    enable: true
+    username: ${KNF4J_BASIC_USERNAME:admin}
+    password: ${KNF4J_BASIC_PASSWORD:123456}
