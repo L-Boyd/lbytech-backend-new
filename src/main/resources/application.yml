@@ -78,3 +78,10 @@ knife4j:
     enable: true
     username: ${KNF4J_BASIC_USERNAME:admin}
     password: ${KNF4J_BASIC_PASSWORD:123456}
+
+lbytech:
+  jwt:
+    secret-key: ${JWT_SECRET-KEY}
+    token-name: token
+    # 单位：ms
+    ttl-millis: 7200000
