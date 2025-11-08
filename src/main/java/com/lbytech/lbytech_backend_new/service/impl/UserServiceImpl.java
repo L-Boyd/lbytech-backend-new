@@ -13,6 +13,7 @@ import com.lbytech.lbytech_backend_new.pojo.entity.User;
 import com.lbytech.lbytech_backend_new.pojo.vo.UserVO;
 import com.lbytech.lbytech_backend_new.service.IMailService;
 import com.lbytech.lbytech_backend_new.service.IUserService;
+import com.lbytech.lbytech_backend_new.util.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
@@ -20,6 +21,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -33,6 +36,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private StringRedisTemplate stringRedisTemplate;
 
     private final String SALT = "lbytech";
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     /**
      * 发送验证码
@@ -129,6 +135,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             }
             UserVO userVO = new UserVO();
             BeanUtil.copyProperties(user, userVO);
+
+            // 生成jwt
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("email", user.getEmail());
+            userVO.setToken(jwtUtil.createJWT(claims));
+
             // 登录成功后，删除Redis中的验证码
             stringRedisTemplate.delete(email);
             return userVO;
@@ -149,6 +161,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
         UserVO userVO = new UserVO();
         BeanUtil.copyProperties(user, userVO);
+
+        // 生成jwt
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("email", user.getEmail());
+        userVO.setToken(jwtUtil.createJWT(claims));
+
         return userVO;
     }
 
