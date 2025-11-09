@@ -11,6 +11,13 @@ spring:
     url: jdbc:mysql://${DB_HOST:localhost}:3306/lbytech_backend_new?useSSL=false&serverTimezone=Asia/Shanghai
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:123456}
+    # 连接池配置
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 15
+      connection-timeout: 300000
+      dle-timeout: 600000
+      max-lifetime: 1800000
   
   data:
     redis:
