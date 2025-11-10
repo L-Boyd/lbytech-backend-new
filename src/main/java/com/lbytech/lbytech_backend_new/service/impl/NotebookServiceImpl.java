@@ -23,8 +23,13 @@ public class NotebookServiceImpl extends ServiceImpl<NotebookMapper, Notebook> i
     @Override
     public String uploadFile(MultipartFile file) {
         String url = aliOssUtil.uploadFile(file);
-        Notebook notebook = new Notebook(file.getOriginalFilename(), url, LocalDateTime.now());
-        this.save(notebook);
+        Notebook notebook = this.lambdaQuery()
+                .eq(Notebook::getFileName, file.getOriginalFilename())
+                .one();
+        if (notebook == null) {
+            notebook = new Notebook(file.getOriginalFilename(), url, LocalDateTime.now());
+            this.save(notebook);
+        }
         return url;
     }
 
