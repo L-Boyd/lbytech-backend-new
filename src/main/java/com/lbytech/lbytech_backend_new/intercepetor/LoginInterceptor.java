@@ -10,7 +10,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 /**
  * 拦截部分需要鉴权的请求
  */
-public class AuthInterceptor implements HandlerInterceptor {
+public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
