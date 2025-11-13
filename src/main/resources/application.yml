@@ -16,8 +16,8 @@ spring:
       minimum-idle: 5
       maximum-pool-size: 15
       connection-timeout: 300000
-      dle-timeout: 600000
-      max-lifetime: 1800000
+      dle-timeout: 300000 # 5分钟，空闲连接超时时间
+      max-lifetime: 900000 # 15分钟，最大连接生命周期
   
   data:
     redis:
