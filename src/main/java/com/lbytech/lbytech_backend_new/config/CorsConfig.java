@@ -13,6 +13,7 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         // 允许前端域名（本地8000），生产环境替换为实际前端域名
         config.addAllowedOrigin("http://localhost:8000");
+        config.addAllowedOrigin("*");
         // 允许所有请求头（如Authorization、Content-Type）
         config.addAllowedHeader("*");
         // 允许所有请求方法（GET、POST、PUT等）
