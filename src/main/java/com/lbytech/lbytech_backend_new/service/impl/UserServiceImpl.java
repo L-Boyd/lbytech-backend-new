@@ -1,11 +1,13 @@
 package com.lbytech.lbytech_backend_new.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lbytech.lbytech_backend_new.constant.RedisConstants;
 import com.lbytech.lbytech_backend_new.exception.BusinessException;
 import com.lbytech.lbytech_backend_new.mapper.UserMapper;
 import com.lbytech.lbytech_backend_new.pojo.Enum.StatusCodeEnum;
@@ -136,10 +138,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             UserVO userVO = new UserVO();
             BeanUtil.copyProperties(user, userVO);
 
-            // 生成jwt
+            // 生成jwt（其实这里生成普通token即可，不需要jwt，因为又用redis控制过期）
             Map<String, Object> claims = new HashMap<>();
             claims.put("email", user.getEmail());
-            userVO.setToken(jwtUtil.createJWT(claims));
+            String jwtToken = jwtUtil.createJWT(claims);
+            userVO.setToken(jwtToken);
+
+            // jwt为key，用户信息为value，存到redis中
+            Map<String, Object> userMap = BeanUtil.beanToMap(userVO, new HashMap<>(),
+                    CopyOptions.create()
+                            .setIgnoreNullValue(true)
+                            // 把所有字段变成字符串
+                            .setFieldValueEditor((fieldName, fieldValue) -> fieldValue.toString()));
+            stringRedisTemplate.opsForHash().putAll(jwtToken, userMap);
+            // 设置token有效期
+            stringRedisTemplate.expire(jwtToken, RedisConstants.USER_LOGIN_TTL, TimeUnit.SECONDS);
 
             // 登录成功后，删除Redis中的验证码
             stringRedisTemplate.delete(email);
@@ -165,7 +178,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 生成jwt
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", user.getEmail());
-        userVO.setToken(jwtUtil.createJWT(claims));
+        String jwtToken = jwtUtil.createJWT(claims);
+        userVO.setToken(jwtToken);
+
+        // jwt为key，用户信息为value，存到redis中
+        Map<String, Object> userMap = BeanUtil.beanToMap(userVO, new HashMap<>(),
+                CopyOptions.create()
+                        .setIgnoreNullValue(true)
+                        // 把所有字段变成字符串
+                        .setFieldValueEditor((fieldName, fieldValue) -> fieldValue.toString()));
+        stringRedisTemplate.opsForHash().putAll(jwtToken, userMap);
+        // 设置token有效期
+        stringRedisTemplate.expire(jwtToken, RedisConstants.USER_LOGIN_TTL, RedisConstants.USER_LOGIN_TTL_TIME_UNIT);
 
         return userVO;
     }
