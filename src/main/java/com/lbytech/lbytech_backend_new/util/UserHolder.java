@@ -1,18 +1,18 @@
 package com.lbytech.lbytech_backend_new.util;
 
-import com.lbytech.lbytech_backend_new.pojo.entity.User;
+import com.lbytech.lbytech_backend_new.pojo.vo.UserVO;
 
 /**
  * 用户信息 holder
  */
 public class UserHolder {
-    private static final ThreadLocal<User> threadLocal = new ThreadLocal<>();
+    private static final ThreadLocal<UserVO> threadLocal = new ThreadLocal<>();
 
-    public static void saveUser(User user){
+    public static void saveUser(UserVO user){
         threadLocal.set(user);
     }
 
-    public static User getUser(){
+    public static UserVO getUser(){
         return threadLocal.get();
     }
 

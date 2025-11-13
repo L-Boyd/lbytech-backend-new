@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.lbytech.lbytech_backend_new.constant.RedisConstants;
 import com.lbytech.lbytech_backend_new.pojo.entity.User;
+import com.lbytech.lbytech_backend_new.pojo.vo.UserVO;
 import com.lbytech.lbytech_backend_new.util.UserHolder;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,8 +40,8 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
             return true;
         }
         // 存在，保存用户信息到ThreadLocal
-        User user = BeanUtil.fillBeanWithMap(userMap, new User(), false);
-        UserHolder.saveUser(user);
+        UserVO userVO = BeanUtil.fillBeanWithMap(userMap, new UserVO(), false);
+        UserHolder.saveUser(userVO);
 
         // 刷新token有效期
         stringRedisTemplate.expire(token, RedisConstants.USER_LOGIN_TTL, RedisConstants.USER_LOGIN_TTL_TIME_UNIT);

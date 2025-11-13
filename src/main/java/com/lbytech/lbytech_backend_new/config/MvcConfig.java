@@ -1,7 +1,8 @@
 package com.lbytech.lbytech_backend_new.config;
 
-import com.lbytech.lbytech_backend_new.intercepetor.AuthInterceptor;
+import com.lbytech.lbytech_backend_new.intercepetor.LoginInterceptor;
 import com.lbytech.lbytech_backend_new.intercepetor.RefreshTokenInterceptor;
+import com.lbytech.lbytech_backend_new.intercepetor.UploadInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -23,9 +24,16 @@ public class MvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 .order(0);  // order越小越先拦截
 
-        registry.addInterceptor(new AuthInterceptor())
+        // 检测是否登录
+        registry.addInterceptor(new LoginInterceptor())
                 .addPathPatterns(
                         "/notebook/**"
                 ).order(1);
+
+        // 检测是否有权限上传文件
+        registry.addInterceptor(new UploadInterceptor())
+                .addPathPatterns(
+                        "/notebook/upload"
+                ).order(2);
     }
 }
