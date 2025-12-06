@@ -1,12 +1,61 @@
 package com.lbytech.lbytech_backend_new.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lbytech.lbytech_backend_new.exception.BusinessException;
 import com.lbytech.lbytech_backend_new.mapper.ThumbRecordMapper;
+import com.lbytech.lbytech_backend_new.pojo.Enum.StatusCodeEnum;
+import com.lbytech.lbytech_backend_new.pojo.entity.Notebook;
 import com.lbytech.lbytech_backend_new.pojo.entity.ThumbRecord;
+import com.lbytech.lbytech_backend_new.pojo.vo.UserVO;
+import com.lbytech.lbytech_backend_new.service.INotebookService;
 import com.lbytech.lbytech_backend_new.service.IThumbRecordService;
+import com.lbytech.lbytech_backend_new.util.UserHolder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Service
 public class ThumbRecordServiceImpl extends ServiceImpl<ThumbRecordMapper, ThumbRecord> implements IThumbRecordService {
 
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+
+    @Autowired
+    @Lazy // 懒加载，解决循环依赖
+    private INotebookService notebookService;
+
+    @Override
+    public Boolean thumbNotebook(Integer notebookId) {
+        UserVO user = UserHolder.getUser();
+
+        // 加锁
+        synchronized (user.getEmail().intern()) {
+            // 事务式编程
+            Boolean executed = transactionTemplate.execute(status -> {
+                // 检查是否已点赞
+                boolean exists = this.lambdaQuery()
+                        .eq(ThumbRecord::getUserEmail, user.getEmail())
+                        .eq(ThumbRecord::getNotebookId, notebookId)
+                        .exists();
+                if (exists) {
+                    throw new BusinessException(StatusCodeEnum.FAIL, "用户已点赞该笔记");
+                }
+
+                boolean update = notebookService.lambdaUpdate()
+                        .eq(Notebook::getId, notebookId)
+                        .setSql("thumb_count = thumb_count + 1")
+                        .update();
+
+                ThumbRecord thumbRecord = new ThumbRecord();
+                thumbRecord.setNotebookId(notebookId);
+                thumbRecord.setUserEmail(user.getEmail());
+
+                // 两个都成功才执行
+                return update && this.save(thumbRecord);
+            });
+
+            return executed;
+        }
+    }
 }

@@ -1,11 +1,13 @@
 package com.lbytech.lbytech_backend_new.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.lbytech.lbytech_backend_new.pojo.entity.Notebook;
 import com.lbytech.lbytech_backend_new.pojo.vo.NotebookVO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-public interface INotebookService {
+public interface INotebookService extends IService<Notebook> {
 
     /**
      * 上传文件

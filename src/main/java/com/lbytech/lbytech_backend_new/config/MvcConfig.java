@@ -27,7 +27,8 @@ public class MvcConfig implements WebMvcConfigurer {
         // 检测是否登录
         registry.addInterceptor(new LoginInterceptor())
                 .addPathPatterns(
-                        "/notebook/**"
+                        "/notebook/**",
+                        "/thumb/**"
                 ).order(1);
 
         // 检测是否有权限上传文件
