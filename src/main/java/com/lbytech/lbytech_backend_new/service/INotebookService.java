@@ -21,4 +21,10 @@ public interface INotebookService {
      */
     List<NotebookVO> getFileList();
 
+     /**
+      * 根据id获取笔记详情
+      * @param id 文件id
+      * @return 文件详情
+      */
+    NotebookVO getFileById(Integer id);
 }

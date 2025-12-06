@@ -40,4 +40,13 @@ public class NotebookController {
         List<NotebookVO> fileList = notebookService.getFileList();
         return ResultUtil.success(fileList);
     }
+
+    /**
+     * 根据id获取文件详情
+     */
+    @GetMapping("/detail")
+    public BaseResponse<NotebookVO> getFileById(Integer id) {
+        NotebookVO notebookVO = notebookService.getFileById(id);
+        return ResultUtil.success(notebookVO);
+    }
 }

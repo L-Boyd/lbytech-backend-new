@@ -1,11 +1,15 @@
 package com.lbytech.lbytech_backend_new.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lbytech.lbytech_backend_new.mapper.NotebookMapper;
 import com.lbytech.lbytech_backend_new.pojo.entity.Notebook;
+import com.lbytech.lbytech_backend_new.pojo.entity.ThumbRecord;
 import com.lbytech.lbytech_backend_new.pojo.vo.NotebookVO;
 import com.lbytech.lbytech_backend_new.service.INotebookService;
+import com.lbytech.lbytech_backend_new.service.IThumbRecordService;
 import com.lbytech.lbytech_backend_new.util.AliOssUtil;
+import com.lbytech.lbytech_backend_new.util.UserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +23,9 @@ public class NotebookServiceImpl extends ServiceImpl<NotebookMapper, Notebook> i
 
     @Autowired
     private AliOssUtil aliOssUtil;
+
+    @Autowired
+    private IThumbRecordService thumbRecordService;
 
     @Override
     public String uploadFile(MultipartFile file) {
@@ -50,4 +57,20 @@ public class NotebookServiceImpl extends ServiceImpl<NotebookMapper, Notebook> i
                         .collect(Collectors.toList());
         return notebookVOList;
     }
+
+    @Override
+    public NotebookVO getFileById(Integer id) {
+        Notebook notebook = this.getById(id);
+        NotebookVO notebookVO = BeanUtil.copyProperties(notebook, NotebookVO.class);
+
+        ThumbRecord thumbRecord = thumbRecordService.lambdaQuery()
+                .eq(ThumbRecord::getNotebookId, id)
+                .eq(ThumbRecord::getUserEmail, UserHolder.getUser().getEmail())
+                .one();
+        // 查出来的记录不为空，说明用户点过赞
+        notebookVO.setIsThumbed(thumbRecord != null);
+
+        return notebookVO;
+    }
+
 }
