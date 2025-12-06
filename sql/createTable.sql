@@ -29,3 +29,15 @@ alter table notebook
 alter table notebook
     add update_time datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间';
 
+create table thumb_record
+(
+    id          bigint auto_increment comment '记录id'
+        primary key,
+    user_email  varchar(255)                       not null comment '用户邮箱',
+    notebook_id int                                not null comment '笔记id',
+    create_time datetime default current_timestamp not null comment '创建时间',
+    constraint thumb_record_uk
+        unique (user_email, notebook_id)
+)
+    comment '点赞记录表';
+
