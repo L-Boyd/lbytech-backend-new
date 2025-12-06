@@ -44,7 +44,7 @@ public class NotebookController {
     /**
      * 根据id获取文件详情
      */
-    @GetMapping("/detail")
+    @GetMapping("/getFileById")
     public BaseResponse<NotebookVO> getFileById(Integer id) {
         NotebookVO notebookVO = notebookService.getFileById(id);
         return ResultUtil.success(notebookVO);
