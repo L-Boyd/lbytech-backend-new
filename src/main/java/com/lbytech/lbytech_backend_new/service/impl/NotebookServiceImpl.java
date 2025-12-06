@@ -50,6 +50,7 @@ public class NotebookServiceImpl extends ServiceImpl<NotebookMapper, Notebook> i
         List<NotebookVO> notebookVOList = notebookList.stream()
                         .map(notebook -> {
                             NotebookVO notebookVO = new NotebookVO();
+                            notebookVO.setId(notebook.getId());
                             notebookVO.setFileName(notebook.getFileName());
                             notebookVO.setFileUrl(notebook.getFileUrl());
                             return notebookVO;
