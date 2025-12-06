@@ -13,4 +13,11 @@ public interface IThumbRecordService extends IService<ThumbRecord> {
      */
     Boolean thumbNotebook(Integer notebookId);
 
+     /**
+     * 取消点赞笔记
+     *
+     * @param notebookId 要取消点赞的笔记id
+     * @return 是否成功
+     */
+    Boolean unThumbNotebook(Integer notebookId);
 }

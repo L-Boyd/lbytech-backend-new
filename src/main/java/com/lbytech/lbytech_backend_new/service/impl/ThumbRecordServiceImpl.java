@@ -58,4 +58,34 @@ public class ThumbRecordServiceImpl extends ServiceImpl<ThumbRecordMapper, Thumb
             return executed;
         }
     }
+
+    @Override
+    public Boolean unThumbNotebook(Integer notebookId) {
+        UserVO user = UserHolder.getUser();
+
+        // 加锁
+        synchronized (user.getEmail().intern()) {
+            // 事务式编程
+            Boolean executed = transactionTemplate.execute(status -> {
+                // 检查是否已点赞
+                ThumbRecord thumbRecord = this.lambdaQuery()
+                        .eq(ThumbRecord::getUserEmail, user.getEmail())
+                        .eq(ThumbRecord::getNotebookId, notebookId)
+                        .one();
+                if (thumbRecord == null) {
+                    throw new BusinessException(StatusCodeEnum.FAIL, "用户未点赞该笔记");
+                }
+
+                boolean update = notebookService.lambdaUpdate()
+                        .eq(Notebook::getId, notebookId)
+                        .setSql("thumb_count = thumb_count - 1")
+                        .update();
+
+                // 两个都成功才执行
+                return update && this.removeById(thumbRecord);
+            });
+
+            return executed;
+        }
+    }
 }

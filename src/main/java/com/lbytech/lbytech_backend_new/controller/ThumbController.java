@@ -25,4 +25,11 @@ public class ThumbController {
         return ResultUtil.success(success);
     }
 
+    @PostMapping("/unThumbNotebook")
+    @Operation(summary = "取消点赞笔记本")   // springdoc描述方法
+    public BaseResponse<Boolean> unThumbNotebook(Integer notebookId) {
+        Boolean success = thumbRecordService.unThumbNotebook(notebookId);
+        return ResultUtil.success(success);
+    }
+
 }
