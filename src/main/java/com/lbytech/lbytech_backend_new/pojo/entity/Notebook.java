@@ -24,8 +24,14 @@ public class Notebook {
     @TableField("file_url")
     private String fileUrl;
 
+     @TableField("thumb_count")
+    private Integer thumbCount;
+
     @TableField("create_time")
     private LocalDateTime createTime;
+
+    @TableField("update_time")
+    private LocalDateTime updateTime;
 
     public Notebook(String fileName, String fileUrl, LocalDateTime createTime) {
         this.fileName = fileName;
