@@ -81,13 +81,16 @@ public class ThumbRecordServiceImpl extends ServiceImpl<ThumbRecordMapper, Thumb
             // 事务式编程
             Boolean executed = transactionTemplate.execute(status -> {
                 // 检查是否已点赞
-                ThumbRecord thumbRecord = this.lambdaQuery()
+                /*ThumbRecord thumbRecord = this.lambdaQuery()
                         .eq(ThumbRecord::getUserEmail, user.getEmail())
                         .eq(ThumbRecord::getNotebookId, notebookId)
-                        .one();
-                if (thumbRecord == null) {
+                        .one();*/
+                // 从redis中获取点赞记录id
+                Object thumbRecordIdObj = stringRedisTemplate.opsForHash().get(ThumbConstant.USER_THUMB_KEY_PREFIX + user.getEmail(), notebookId.toString());
+                if (thumbRecordIdObj == null) {
                     throw new BusinessException(StatusCodeEnum.FAIL, "用户未点赞该笔记");
                 }
+                Long thumbRecordId = Long.valueOf(thumbRecordIdObj.toString());
 
                 boolean update = notebookService.lambdaUpdate()
                         .eq(Notebook::getId, notebookId)
@@ -95,7 +98,14 @@ public class ThumbRecordServiceImpl extends ServiceImpl<ThumbRecordMapper, Thumb
                         .update();
 
                 // 两个都成功才执行
-                return update && this.removeById(thumbRecord);
+                boolean success = update && this.removeById(thumbRecordId);
+
+                if (success) {
+                    // 从redis中删除点赞记录id
+                    stringRedisTemplate.opsForHash().delete(ThumbConstant.USER_THUMB_KEY_PREFIX + user.getEmail(), notebookId.toString());
+                }
+
+                return success;
             });
 
             return executed;
