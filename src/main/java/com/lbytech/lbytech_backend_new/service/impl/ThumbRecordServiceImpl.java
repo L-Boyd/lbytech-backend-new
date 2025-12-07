@@ -112,7 +112,8 @@ public class ThumbRecordServiceImpl extends ServiceImpl<ThumbRecordMapper, Thumb
         }
     }
 
-    private boolean hasThumb(String userEmail, Integer notebookId) {
+    @Override
+    public Boolean hasThumb(String userEmail, Integer notebookId) {
         return stringRedisTemplate.opsForHash().hasKey(ThumbConstant.USER_THUMB_KEY_PREFIX + userEmail, notebookId.toString());
     }
 }

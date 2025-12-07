@@ -63,12 +63,15 @@ public class NotebookServiceImpl extends ServiceImpl<NotebookMapper, Notebook> i
         Notebook notebook = this.getById(id);
         NotebookVO notebookVO = BeanUtil.copyProperties(notebook, NotebookVO.class);
 
-        ThumbRecord thumbRecord = thumbRecordService.lambdaQuery()
+        /*ThumbRecord thumbRecord = thumbRecordService.lambdaQuery()
                 .eq(ThumbRecord::getNotebookId, id)
                 .eq(ThumbRecord::getUserEmail, UserHolder.getUser().getEmail())
                 .one();
         // 查出来的记录不为空，说明用户点过赞
-        notebookVO.setIsThumbed(thumbRecord != null);
+        notebookVO.setIsThumbed(thumbRecord != null);*/
+
+        boolean isThumbed = thumbRecordService.hasThumb(UserHolder.getUser().getEmail(), id);
+        notebookVO.setIsThumbed(isThumbed);
 
         return notebookVO;
     }

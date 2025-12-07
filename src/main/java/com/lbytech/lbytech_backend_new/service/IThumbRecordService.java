@@ -20,4 +20,13 @@ public interface IThumbRecordService extends IService<ThumbRecord> {
      * @return 是否成功
      */
     Boolean unThumbNotebook(Integer notebookId);
+
+     /**
+     * 查询用户是否点赞了该笔记
+     *
+     * @param userEmail 用户邮箱
+     * @param notebookId 笔记id
+     * @return 是否点赞了该笔记
+     */
+    Boolean hasThumb(String userEmail, Integer notebookId);
 }
