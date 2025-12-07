@@ -1,6 +1,7 @@
 package com.lbytech.lbytech_backend_new.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lbytech.lbytech_backend_new.constant.ThumbConstant;
 import com.lbytech.lbytech_backend_new.exception.BusinessException;
 import com.lbytech.lbytech_backend_new.mapper.ThumbRecordMapper;
 import com.lbytech.lbytech_backend_new.pojo.Enum.StatusCodeEnum;
@@ -12,6 +13,7 @@ import com.lbytech.lbytech_backend_new.service.IThumbRecordService;
 import com.lbytech.lbytech_backend_new.util.UserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -25,6 +27,9 @@ public class ThumbRecordServiceImpl extends ServiceImpl<ThumbRecordMapper, Thumb
     @Lazy // 懒加载，解决循环依赖
     private INotebookService notebookService;
 
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
     @Override
     public Boolean thumbNotebook(Integer notebookId) {
         UserVO user = UserHolder.getUser();
@@ -34,10 +39,11 @@ public class ThumbRecordServiceImpl extends ServiceImpl<ThumbRecordMapper, Thumb
             // 事务式编程
             Boolean executed = transactionTemplate.execute(status -> {
                 // 检查是否已点赞
-                boolean exists = this.lambdaQuery()
+                /*boolean exists = this.lambdaQuery()
                         .eq(ThumbRecord::getUserEmail, user.getEmail())
                         .eq(ThumbRecord::getNotebookId, notebookId)
-                        .exists();
+                        .exists();*/
+                boolean exists = hasThumb(user.getEmail(), notebookId);
                 if (exists) {
                     throw new BusinessException(StatusCodeEnum.FAIL, "用户已点赞该笔记");
                 }
@@ -51,8 +57,15 @@ public class ThumbRecordServiceImpl extends ServiceImpl<ThumbRecordMapper, Thumb
                 thumbRecord.setNotebookId(notebookId);
                 thumbRecord.setUserEmail(user.getEmail());
 
+                boolean success = update && this.save(thumbRecord);
+
+                if (success) {
+                    // 点赞记录存入redis：key为用户邮箱，field为笔记id，value为点赞记录id
+                    stringRedisTemplate.opsForHash().put(ThumbConstant.USER_THUMB_KEY_PREFIX + user.getEmail(), notebookId.toString(), thumbRecord.getId().toString());
+                }
+
                 // 两个都成功才执行
-                return update && this.save(thumbRecord);
+                return success;
             });
 
             return executed;
@@ -87,5 +100,9 @@ public class ThumbRecordServiceImpl extends ServiceImpl<ThumbRecordMapper, Thumb
 
             return executed;
         }
+    }
+
+    private boolean hasThumb(String userEmail, Integer notebookId) {
+        return stringRedisTemplate.opsForHash().hasKey(ThumbConstant.USER_THUMB_KEY_PREFIX + userEmail, notebookId.toString());
     }
 }
