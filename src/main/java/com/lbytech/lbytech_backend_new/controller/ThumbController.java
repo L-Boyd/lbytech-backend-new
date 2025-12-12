@@ -1,14 +1,13 @@
 package com.lbytech.lbytech_backend_new.controller;
 
+import com.lbytech.lbytech_backend_new.pojo.dto.ThumbRequest;
 import com.lbytech.lbytech_backend_new.pojo.vo.BaseResponse;
 import com.lbytech.lbytech_backend_new.service.IThumbRecordService;
 import com.lbytech.lbytech_backend_new.util.ResultUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/thumb")
@@ -20,15 +19,15 @@ public class ThumbController {
 
     @PostMapping("/thumbNotebook")
     @Operation(summary = "点赞笔记本")   // springdoc描述方法
-    public BaseResponse<Boolean> thumbNotebook(Integer notebookId) {
-        Boolean success = thumbRecordService.thumbNotebook(notebookId);
+    public BaseResponse<Boolean> thumbNotebook(@RequestBody ThumbRequest thumbRequest) {
+        Boolean success = thumbRecordService.thumbNotebook(thumbRequest.getNotebookId());
         return ResultUtil.success(success);
     }
 
     @PostMapping("/unThumbNotebook")
     @Operation(summary = "取消点赞笔记本")   // springdoc描述方法
-    public BaseResponse<Boolean> unThumbNotebook(Integer notebookId) {
-        Boolean success = thumbRecordService.unThumbNotebook(notebookId);
+    public BaseResponse<Boolean> unThumbNotebook(@RequestBody ThumbRequest thumbRequest) {
+        Boolean success = thumbRecordService.unThumbNotebook(thumbRequest.getNotebookId());
         return ResultUtil.success(success);
     }
 
