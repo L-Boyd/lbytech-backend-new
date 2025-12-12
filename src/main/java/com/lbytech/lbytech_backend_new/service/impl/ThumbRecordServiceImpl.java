@@ -10,6 +10,7 @@ import com.lbytech.lbytech_backend_new.pojo.entity.ThumbRecord;
 import com.lbytech.lbytech_backend_new.pojo.vo.UserVO;
 import com.lbytech.lbytech_backend_new.service.INotebookService;
 import com.lbytech.lbytech_backend_new.service.IThumbRecordService;
+import com.lbytech.lbytech_backend_new.util.RedisKeyUtil;
 import com.lbytech.lbytech_backend_new.util.UserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -61,7 +62,7 @@ public class ThumbRecordServiceImpl extends ServiceImpl<ThumbRecordMapper, Thumb
 
                 if (success) {
                     // 点赞记录存入redis：key为用户邮箱，field为笔记id，value为点赞记录id
-                    stringRedisTemplate.opsForHash().put(ThumbConstant.USER_THUMB_KEY_PREFIX + user.getEmail(), notebookId.toString(), thumbRecord.getId().toString());
+                    stringRedisTemplate.opsForHash().put(RedisKeyUtil.getUserThumbKey(user.getEmail()), notebookId.toString(), thumbRecord.getId().toString());
                 }
 
                 // 两个都成功才执行
