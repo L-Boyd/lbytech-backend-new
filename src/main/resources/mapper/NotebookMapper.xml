@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lbytech.lbytech_backend_new.mapper.NotebookMapper">
+
+    <!--
+       批量更新笔记本点赞数
+       参数：countMap - Map<笔记本ID, 点赞数增量>
+       功能：一次性更新多个笔记本的点赞数，避免多次数据库操作
+       使用场景：定时任务批量同步Redis中的临时点赞计数到数据库
+
+       示例：
+       假设countMap如下：
+       key | value
+       1  | 5
+       2  | -3
+       3  | 10
+
+       执行以下SQL：
+       UPDATE notebook
+       SET thumb_count = thumb_count + CASE id
+            WHEN 1 THEN 5
+            WHEN 2 THEN -3
+            WHEN 3 THEN 10
+       END
+       WHERE id IN (1, 2, 3)
+
+    -->
+    <update id="batchUpdateThumbCount">
+        <!--
+           更新笔记本表，设置thumb_count字段为原值加上增量
+           CASE id语句根据不同的笔记本ID设置不同的增量值
+       -->
+        UPDATE notebook
+        SET thumb_count = thumb_count + CASE id
+        <!--
+            遍历countMap的entrySet，为每个键值对生成WHEN-THEN条件
+            key: 笔记本ID
+            value: 点赞数增量（可为正数或负数）
+        -->
+        <foreach collection="countMap.entrySet()" item="value" index="key">
+            WHEN #{key} THEN #{value}
+        </foreach>
+        END
+        <!--
+            只更新countMap中包含的笔记本ID，提高查询效率
+            使用IN语句限制更新范围
+        -->
+        WHERE id IN
+        <!--
+            遍历countMap的keySet，生成IN语句的参数列表
+            item="id": 当前遍历的笔记本ID
+        -->
+        <foreach collection="countMap.keySet()" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+</mapper>
+
