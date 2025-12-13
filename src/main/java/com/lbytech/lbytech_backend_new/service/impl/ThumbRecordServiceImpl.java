@@ -18,7 +18,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
-@Service
+@Service("thumbRecordServiceDB")
 public class ThumbRecordServiceImpl extends ServiceImpl<ThumbRecordMapper, ThumbRecord> implements IThumbRecordService {
 
     @Autowired
