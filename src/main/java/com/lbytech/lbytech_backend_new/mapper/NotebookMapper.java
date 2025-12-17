@@ -2,7 +2,7 @@ package com.lbytech.lbytech_backend_new.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.lbytech.lbytech_backend_new.pojo.entity.Notebook;
-import io.lettuce.core.dynamic.annotation.Param;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Map;
 
