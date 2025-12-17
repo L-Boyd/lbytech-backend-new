@@ -95,3 +95,7 @@ lbytech:
     token-name: token
     # 单位：ms
     ttl-millis: 7200000
+
+logging:
+  level:
+    com.lbytech.lbytech_backend_new: debug

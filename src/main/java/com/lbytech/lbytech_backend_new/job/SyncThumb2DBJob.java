@@ -44,8 +44,8 @@ public class SyncThumb2DBJob {
     @Scheduled(fixedRate = 10000)
     @Transactional(rollbackFor = Exception.class)
     public void run() {
-        log.info("开始执行");
         DateTime nowDate = DateUtil.date();
+        log.debug("开始同步临时数据：{}", nowDate);
         // 如果秒数为0~9 则回到上一分钟的50秒
         int second = (DateUtil.second(nowDate) / 10 - 1) * 10;
         if (second == -10) {
@@ -55,7 +55,7 @@ public class SyncThumb2DBJob {
         }
         String date = DateUtil.format(nowDate, "HH:mm:") + second;
         syncThumb2DBByDate(date);
-        log.info("临时数据同步完成");
+        log.debug("临时数据同步完成：{}", DateUtil.date());
     }
 
     /**
