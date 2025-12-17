@@ -59,7 +59,7 @@ public class RedisLuaScriptConstant {
             end  
               
             -- 2. 获取当前临时计数（若不存在则默认为 0）  
-            local hashKey = userId .. ':' .. blogId  
+            local hashKey = userEmail .. ':' .. notebookId  
             local oldNumber = tonumber(redis.call('HGET', tempThumbKey, hashKey) or 0)  
               
             -- 3. 计算新值并更新  

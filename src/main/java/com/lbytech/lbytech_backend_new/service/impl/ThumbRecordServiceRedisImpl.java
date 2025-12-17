@@ -76,7 +76,7 @@ public class ThumbRecordServiceRedisImpl extends ServiceImpl<ThumbRecordMapper, 
                 RedisLuaScriptConstant.UNTHUMB_SCRIPT,  
                 Arrays.asList(tempThumbKey, userThumbKey),  
                 user.getEmail(),
-                notebookId
+                notebookId.toString()
         );  
         // 根据返回值处理结果  
         if (result == LuaStatusEnum.FAIL.getValue()) {  
