@@ -8,7 +8,7 @@ spring:
     name: lbytech_backend_new
   
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:3306/lbytech_backend_new?useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://${DB_HOST:localhost}:3306/lbytech_backend_new?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:123456}
     # 连接池配置
