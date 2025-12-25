@@ -8,6 +8,12 @@ import java.util.concurrent.BlockingQueue;
  * TopK 算法的接口.
  */
 public interface TopK {
+    /**
+     * 添加一个项到 TopK 中.
+     * @param key 项的键
+     * @param increment 项的增量
+     * @return 添加结果，包含被挤出的项、是否是热门项、以及项的键
+     */
     AddResult add(String key, int increment);
 
     /**
