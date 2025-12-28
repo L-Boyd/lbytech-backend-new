@@ -4,8 +4,10 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lbytech.lbytech_backend_new.constant.RedisLuaScriptConstant;
+import com.lbytech.lbytech_backend_new.exception.BusinessException;
 import com.lbytech.lbytech_backend_new.mapper.ThumbRecordMapper;
 import com.lbytech.lbytech_backend_new.pojo.Enum.LuaStatusEnum;
+import com.lbytech.lbytech_backend_new.pojo.Enum.StatusCodeEnum;
 import com.lbytech.lbytech_backend_new.pojo.entity.ThumbRecord;
 import com.lbytech.lbytech_backend_new.pojo.vo.UserVO;
 import com.lbytech.lbytech_backend_new.service.IThumbRecordService;
@@ -32,7 +34,7 @@ public class ThumbRecordServiceRedisImpl extends ServiceImpl<ThumbRecordMapper, 
     @Override  
     public Boolean thumbNotebook(Integer notebookId) {
         if (notebookId == null) {
-            throw new RuntimeException("参数错误");  
+            throw new BusinessException(StatusCodeEnum.FAIL, "参数错误");
         }
         UserVO user = UserHolder.getUser();
 
@@ -51,7 +53,7 @@ public class ThumbRecordServiceRedisImpl extends ServiceImpl<ThumbRecordMapper, 
         );  
   
         if (LuaStatusEnum.FAIL.getValue() == result) {
-            throw new RuntimeException("用户已点赞");  
+            throw new BusinessException(StatusCodeEnum.FAIL, "用户已点赞");
         }  
   
         // 更新成功才执行  
@@ -61,7 +63,7 @@ public class ThumbRecordServiceRedisImpl extends ServiceImpl<ThumbRecordMapper, 
     @Override  
     public Boolean unThumbNotebook(Integer notebookId) {
         if (notebookId == null) {
-            throw new RuntimeException("参数错误");  
+            throw new BusinessException(StatusCodeEnum.FAIL, "参数错误");
         }
         UserVO user = UserHolder.getUser();
 
@@ -80,7 +82,7 @@ public class ThumbRecordServiceRedisImpl extends ServiceImpl<ThumbRecordMapper, 
         );  
         // 根据返回值处理结果  
         if (result == LuaStatusEnum.FAIL.getValue()) {  
-            throw new RuntimeException("用户未点赞");  
+            throw new BusinessException(StatusCodeEnum.FAIL, "用户未点赞");
         }  
         return LuaStatusEnum.SUCCESS.getValue() == result;  
     }  
