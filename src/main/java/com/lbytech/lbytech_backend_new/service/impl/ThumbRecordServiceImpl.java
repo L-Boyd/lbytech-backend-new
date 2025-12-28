@@ -3,6 +3,7 @@ package com.lbytech.lbytech_backend_new.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lbytech.lbytech_backend_new.constant.ThumbConstant;
 import com.lbytech.lbytech_backend_new.exception.BusinessException;
+import com.lbytech.lbytech_backend_new.manager.cache.CacheManager;
 import com.lbytech.lbytech_backend_new.mapper.ThumbRecordMapper;
 import com.lbytech.lbytech_backend_new.pojo.Enum.StatusCodeEnum;
 import com.lbytech.lbytech_backend_new.pojo.entity.Notebook;
@@ -14,6 +15,7 @@ import com.lbytech.lbytech_backend_new.util.RedisKeyUtil;
 import com.lbytech.lbytech_backend_new.util.UserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -30,6 +32,9 @@ public class ThumbRecordServiceImpl extends ServiceImpl<ThumbRecordMapper, Thumb
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private CacheManager cacheManager;
 
     @Override
     public Boolean thumbNotebook(Integer notebookId) {
@@ -62,7 +67,13 @@ public class ThumbRecordServiceImpl extends ServiceImpl<ThumbRecordMapper, Thumb
 
                 if (success) {
                     // 点赞记录存入redis：key为用户邮箱，field为笔记id，value为点赞记录id
-                    stringRedisTemplate.opsForHash().put(RedisKeyUtil.getUserThumbKey(user.getEmail()), notebookId.toString(), thumbRecord.getId().toString());
+                    //stringRedisTemplate.opsForHash().put(RedisKeyUtil.getUserThumbKey(user.getEmail()), notebookId.toString(), thumbRecord.getId().toString());
+
+                    String hashKey = RedisKeyUtil.getUserThumbKey(user.getEmail());
+                    String fieldKey = notebookId.toString();
+                    Long thumbRecordId = thumbRecord.getId();
+                    stringRedisTemplate.opsForHash().put(hashKey, fieldKey, thumbRecordId.toString());
+                    cacheManager.putIfPresent(hashKey, fieldKey, thumbRecordId);
                 }
 
                 // 两个都成功才执行
@@ -87,8 +98,12 @@ public class ThumbRecordServiceImpl extends ServiceImpl<ThumbRecordMapper, Thumb
                         .eq(ThumbRecord::getNotebookId, notebookId)
                         .one();*/
                 // 从redis中获取点赞记录id
-                Object thumbRecordIdObj = stringRedisTemplate.opsForHash().get(ThumbConstant.USER_THUMB_KEY_PREFIX + user.getEmail(), notebookId.toString());
-                if (thumbRecordIdObj == null) {
+                //Object thumbRecordIdObj = stringRedisTemplate.opsForHash().get(ThumbConstant.USER_THUMB_KEY_PREFIX + user.getEmail(), notebookId.toString());
+                String hashKey = RedisKeyUtil.getUserThumbKey(user.getEmail());
+                String fieldKey = notebookId.toString();
+                Object thumbRecordIdObj = cacheManager.get(hashKey, fieldKey);
+
+                if (thumbRecordIdObj == null || thumbRecordIdObj.equals(ThumbConstant.UN_THUMB_CONSTANT)) {
                     throw new BusinessException(StatusCodeEnum.FAIL, "用户未点赞该笔记");
                 }
                 Long thumbRecordId = Long.valueOf(thumbRecordIdObj.toString());
@@ -103,7 +118,10 @@ public class ThumbRecordServiceImpl extends ServiceImpl<ThumbRecordMapper, Thumb
 
                 if (success) {
                     // 从redis中删除点赞记录id
-                    stringRedisTemplate.opsForHash().delete(ThumbConstant.USER_THUMB_KEY_PREFIX + user.getEmail(), notebookId.toString());
+                    //stringRedisTemplate.opsForHash().delete(ThumbConstant.USER_THUMB_KEY_PREFIX + user.getEmail(), notebookId.toString());
+
+                    stringRedisTemplate.opsForHash().delete(hashKey, fieldKey);
+                    cacheManager.putIfPresent(hashKey, fieldKey, ThumbConstant.UN_THUMB_CONSTANT);
                 }
 
                 return success;
@@ -115,6 +133,17 @@ public class ThumbRecordServiceImpl extends ServiceImpl<ThumbRecordMapper, Thumb
 
     @Override
     public Boolean hasThumb(String userEmail, Integer notebookId) {
-        return stringRedisTemplate.opsForHash().hasKey(ThumbConstant.USER_THUMB_KEY_PREFIX + userEmail, notebookId.toString());
+        //return stringRedisTemplate.opsForHash().hasKey(ThumbConstant.USER_THUMB_KEY_PREFIX + userEmail, notebookId.toString());
+
+        // 取消点赞不能直接从本地缓存删除，因为是热点数据
+        //return cacheManager.get(ThumbConstant.USER_THUMB_KEY_PREFIX + userEmail, notebookId.toString()) != null;
+
+        Object thumbObj = cacheManager.get(RedisKeyUtil.getUserThumbKey(userEmail), notebookId.toString());
+        if (thumbObj == null) {
+            return false;
+        }
+
+        Long thumbStatus = Long.valueOf(thumbObj.toString());
+        return thumbStatus.equals(ThumbConstant.UN_THUMB_CONSTANT);
     }
 }

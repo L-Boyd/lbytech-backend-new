@@ -20,12 +20,11 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Slf4j
 public class CacheManager {
-    private TopK hotKeyDetector;
-    private Cache<String, Object> localCache;
+    private final TopK hotKeyDetector;
+    private final Cache<String, Object> localCache;
 
-    @Bean
-    public TopK getHotKeyDetector() {
-        hotKeyDetector = new HeavyKeeper(
+    public CacheManager() {
+        this.hotKeyDetector = new HeavyKeeper(
                 // 监控 Top 100 Key
                 100,
                 // 宽度
@@ -37,12 +36,7 @@ public class CacheManager {
                 // 最小出现 10 次才记录
                 10
         );
-        return hotKeyDetector;
-    }
-
-    @Bean
-    public Cache<String, Object> localCache() {
-        return localCache = Caffeine.newBuilder()
+        this.localCache = Caffeine.newBuilder()
                 .maximumSize(1000)
                 .expireAfterWrite(5, TimeUnit.MINUTES)
                 .build();
