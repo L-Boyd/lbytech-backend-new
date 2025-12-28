@@ -7,8 +7,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * 基于 HeavyHitters 算法的 TopK 实现.
- * 一种搞笑的流式TopK检测算法，识别数据流中的频繁项（热点key）
+ * 基于 HeavyKeeper 算法的 TopK 实现.
+ * 一种高效的流式TopK检测算法，识别数据流中的频繁项（热点key）
  */
 public class HeavyKeeper implements TopK {
     private static final int LOOKUP_TABLE_SIZE = 256;
