@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 
-@Service("thumbRecordService")
+@Service("thumbRecordServiceRedis")
 @Slf4j
 public class ThumbRecordServiceRedisImpl extends ServiceImpl<ThumbRecordMapper, ThumbRecord> implements IThumbRecordService {
 
