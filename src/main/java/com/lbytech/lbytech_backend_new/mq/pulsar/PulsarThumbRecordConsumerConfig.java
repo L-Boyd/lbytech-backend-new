@@ -17,8 +17,8 @@ public class PulsarThumbRecordConsumerConfig<T> implements PulsarListenerConsume
         consumerBuilder.batchReceivePolicy(
                 BatchReceivePolicy.builder()
                         // 每次处理 1000 条
-                        .maxNumMessages(10)
-                        // 设置超时时间（单位：毫秒）
+                        .maxNumMessages(1000)
+                        // 设置超时时间（单位：毫秒）:收集1000条马上处理，10秒没有新消息也会处理
                         .timeout(10000, TimeUnit.MILLISECONDS)
                         .build()
         );
