@@ -43,7 +43,7 @@ public class ThumbRecordServiceMQImpl extends ServiceImpl<ThumbRecordMapper, Thu
         long result = redisTemplate.execute(
                 RedisLuaScriptConstant.THUMB_SCRIPT_MQ,
                 List.of(userThumbKey),
-                notebookId
+                notebookId.toString()
         );
         if (result == LuaStatusEnum.FAIL.getValue()) {
             throw new BusinessException(StatusCodeEnum.FAIL, "用户已点赞");
@@ -78,7 +78,7 @@ public class ThumbRecordServiceMQImpl extends ServiceImpl<ThumbRecordMapper, Thu
         long result = redisTemplate.execute(
                 RedisLuaScriptConstant.UNTHUMB_SCRIPT_MQ,
                 List.of(userThumbKey),
-                notebookId
+                notebookId.toString()
         );
         if (result == LuaStatusEnum.FAIL.getValue()) {
             throw new BusinessException(StatusCodeEnum.FAIL, "用户未点赞");
