@@ -44,6 +44,9 @@ spring:
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
+  pulsar:
+    client:
+      service-url: pulsar://${PULSAR_ADDRESS:127.0.0.1:6650}
 
 mybatis-plus:
   configuration:
@@ -98,4 +101,4 @@ lbytech:
 
 logging:
   level:
-    com.lbytech.lbytech_backend_new: debug
+    com.lbytech.lbytech_backend_new: info
