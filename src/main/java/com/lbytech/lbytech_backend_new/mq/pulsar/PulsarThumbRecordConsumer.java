@@ -33,7 +33,9 @@ public class PulsarThumbRecordConsumer {
             topics = "thumb-topic",
             schemaType = SchemaType.JSON,
             batch = true,
-            consumerCustomizer = "pulsarThumbRecordConsumerConfig"
+            consumerCustomizer = "pulsarThumbRecordConsumerConfig",
+            negativeAckRedeliveryBackoff = "negativeAckRedeliveryBackoff",
+            ackTimeoutRedeliveryBackoff = "ackTimeoutRedeliveryBackoff"
     )
     @Transactional(rollbackFor = Exception.class)
     public void processBatch(List<Message<ThumbEvent>> messages) {

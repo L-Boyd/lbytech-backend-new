@@ -2,6 +2,9 @@ package com.lbytech.lbytech_backend_new.mq.pulsar;
 
 import org.apache.pulsar.client.api.BatchReceivePolicy;
 import org.apache.pulsar.client.api.ConsumerBuilder;
+import org.apache.pulsar.client.api.RedeliveryBackoff;
+import org.apache.pulsar.client.impl.MultiplierRedeliveryBackoff;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.pulsar.annotation.PulsarListenerConsumerBuilderCustomizer;
 
@@ -23,4 +26,30 @@ public class PulsarThumbRecordConsumerConfig<T> implements PulsarListenerConsume
                         .build()
         );
     }
+
+    // 配置 NACK 重试策略
+    @Bean
+    public RedeliveryBackoff negativeAckRedeliveryBackoff() {
+        return MultiplierRedeliveryBackoff.builder()
+                // 初始延迟 1 秒(当消息首次处理失败并NACK时，会等待1秒后进行第一次重试)
+                .minDelayMs(1000)
+                // 最大延迟 60 秒(无论重试多少次，单次延迟时间不会超过60秒)
+                .maxDelayMs(60_000)
+                // 每次重试延迟倍数(每次重试延迟时间会乘以这个倍数，例如第一次重试延迟1秒，第二次重试延迟2秒，第三次重试延迟4秒，以此类推)
+                .multiplier(2)
+                .build();
+    }
+
+    // 配置 ACK 超时重试策略
+    @Bean
+    public RedeliveryBackoff ackTimeoutRedeliveryBackoff() {
+        return MultiplierRedeliveryBackoff.builder()
+                // 初始延迟 5 秒
+                .minDelayMs(5000)
+                // 最大延迟 300 秒
+                .maxDelayMs(300_000)
+                .multiplier(3)
+                .build();
+    }
+
 }
