@@ -9,6 +9,8 @@ import com.lbytech.lbytech_backend_new.service.IThumbRecordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.client.api.Message;
+import org.apache.pulsar.client.api.MessageId;
+import org.apache.pulsar.client.api.SubscriptionType;
 import org.apache.pulsar.common.schema.SchemaType;
 import org.springframework.pulsar.annotation.PulsarListener;
 import org.springframework.stereotype.Service;
@@ -33,14 +35,18 @@ public class PulsarThumbRecordConsumer {
             topics = "thumb-topic",
             schemaType = SchemaType.JSON,
             batch = true,
-            consumerCustomizer = "pulsarThumbRecordConsumerConfig",
+            //consumerCustomizer = "pulsarThumbRecordConsumerConfig",   // 会导致超时、nack配置失效
             negativeAckRedeliveryBackoff = "negativeAckRedeliveryBackoff",
-            ackTimeoutRedeliveryBackoff = "ackTimeoutRedeliveryBackoff"
+            ackTimeoutRedeliveryBackoff = "ackTimeoutRedeliveryBackoff",
+            subscriptionType = SubscriptionType.Shared, // 没这个死信队列不生效
+            deadLetterPolicy = "deadLetterPolicy"
     )
     @Transactional(rollbackFor = Exception.class)
     public void processBatch(List<Message<ThumbEvent>> messages) {
         log.info("ThumbConsumer processBatch: {}", messages.size());
-
+        /*if (true) {
+            throw new RuntimeException("ThumbConsumer processBatch fail");
+        }*/
         // notebookId, 点赞数
         Map<Integer, Integer> countMap = new ConcurrentHashMap<>();
         List<ThumbRecord> thumbRecords = new ArrayList<>();
@@ -115,4 +121,12 @@ public class PulsarThumbRecordConsumer {
             thumbRecordService.saveBatch(thumbRecords, 5);
         }
     }
+
+    @PulsarListener(topics = "thumb-dlq-topic")
+    public void consumerDlq(Message<ThumbEvent> message) {
+        MessageId messageId = message.getMessageId();
+        log.info("消息 {} 处理失败，进入死信队列", messageId);
+        // TODO 消息入库、通知相关人员处理消息
+    }
+
 }

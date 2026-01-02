@@ -2,6 +2,7 @@ package com.lbytech.lbytech_backend_new.mq.pulsar;
 
 import org.apache.pulsar.client.api.BatchReceivePolicy;
 import org.apache.pulsar.client.api.ConsumerBuilder;
+import org.apache.pulsar.client.api.DeadLetterPolicy;
 import org.apache.pulsar.client.api.RedeliveryBackoff;
 import org.apache.pulsar.client.impl.MultiplierRedeliveryBackoff;
 import org.springframework.context.annotation.Bean;
@@ -51,5 +52,17 @@ public class PulsarThumbRecordConsumerConfig<T> implements PulsarListenerConsume
                 .multiplier(3)
                 .build();
     }
+
+    // 死信策略
+    @Bean
+    public DeadLetterPolicy deadLetterPolicy() {
+        return DeadLetterPolicy.builder()
+                // 最大重试次数(当消息重试次数超过3次时，会将消息发送到死信队列)
+                .maxRedeliverCount(3)
+                // 死信主题名称
+                .deadLetterTopic("thumb-dlq-topic")
+                .build();
+    }
+
 
 }
