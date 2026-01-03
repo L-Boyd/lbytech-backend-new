@@ -44,11 +44,11 @@ class LbytechBackendNewApplicationTests {
     private String TEST_PASSWORD;
 
     /**
-     * 添加10000个测试用户
+     * 添加50000个测试用户
      */
     @Test
     void addUser() {
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 50000; i++) {
             String encryptedPassword = DigestUtil.md5Hex(TEST_PASSWORD + SALT);
             User user = new User("test" + i + "@qq.com", encryptedPassword, LocalDateTime.now());
             userService.save(user);
@@ -59,7 +59,7 @@ class LbytechBackendNewApplicationTests {
     void testLoginAndExportTokenToCsv() throws Exception {
         List<User> list = userService.list();
         list = list.stream()
-                .filter(u -> u.getId() >= 10009 && u.getId() <= 20008)
+                .filter(u -> u.getId() >= 10009 && u.getId() <= 60008)
                 .collect(Collectors.toList());
 
         try (PrintWriter writer = new PrintWriter(new FileWriter("token_output.csv", false))) {
