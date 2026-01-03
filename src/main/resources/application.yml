@@ -102,3 +102,6 @@ lbytech:
 logging:
   level:
     com.lbytech.lbytech_backend_new: info
+
+test:
+  password: ${TEST_PASSWORD:123456}

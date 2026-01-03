@@ -1,9 +1,11 @@
 package com.lbytech.lbytech_backend_new.service;
 
 
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.lbytech.lbytech_backend_new.pojo.entity.User;
 import com.lbytech.lbytech_backend_new.pojo.vo.UserVO;
 
-public interface IUserService {
+public interface IUserService extends IService<User> {
 
         /**
          * 发送验证码
