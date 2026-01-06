@@ -45,6 +45,10 @@ public class ThumbRecordServiceMQImpl extends ServiceImpl<ThumbRecordMapper, Thu
                 List.of(userThumbKey),
                 notebookId.toString()
         );
+        // 检查 Lua 脚本执行结果
+        if (result == LuaStatusEnum.NOTEBOOK_NOT_EXIST.getValue()) {
+            throw new BusinessException(StatusCodeEnum.FAIL, "笔记不存在");
+        }
         if (result == LuaStatusEnum.FAIL.getValue()) {
             throw new BusinessException(StatusCodeEnum.FAIL, "用户已点赞");
         }

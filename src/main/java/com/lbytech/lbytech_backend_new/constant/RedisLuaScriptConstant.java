@@ -79,10 +79,16 @@ public class RedisLuaScriptConstant {
      * 返回:
      * -1: 已点赞
      * 1: 操作成功
+     * -2: 笔记不存在
      */
     public static final RedisScript<Long> THUMB_SCRIPT_MQ = new DefaultRedisScript<>("""  
                     local userThumbKey = KEYS[1]
                     local notebookId = ARGV[1]
+                    
+                    -- 判断笔记是否存在
+                    if redis.call("SISMEMBER", "notebook:id_set", notebookId) == 0 then
+                        return -2
+                    end
             
                     -- 判断是否已经点赞
                     if redis.call("HEXISTS", userThumbKey, notebookId) == 1 then

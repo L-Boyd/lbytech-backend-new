@@ -11,6 +11,7 @@ import com.lbytech.lbytech_backend_new.service.IThumbRecordService;
 import com.lbytech.lbytech_backend_new.util.AliOssUtil;
 import com.lbytech.lbytech_backend_new.util.UserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,6 +28,9 @@ public class NotebookServiceImpl extends ServiceImpl<NotebookMapper, Notebook> i
     @Autowired
     private IThumbRecordService thumbRecordService;
 
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
     @Override
     public String uploadFile(MultipartFile file) {
         String url = aliOssUtil.uploadFile(file);
@@ -36,6 +40,8 @@ public class NotebookServiceImpl extends ServiceImpl<NotebookMapper, Notebook> i
         if (notebook == null) {
             notebook = new Notebook(file.getOriginalFilename(), url, LocalDateTime.now());
             this.save(notebook);
+            stringRedisTemplate.opsForSet()
+                    .add("notebook:id_set", String.valueOf(notebook.getId()));
         }
         return url;
     }

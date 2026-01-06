@@ -11,7 +11,9 @@ public enum LuaStatusEnum {
     SUCCESS(1L),
     // 失败  
     FAIL(-1L),
-    ;  
+    // 笔记不存在
+    NOTEBOOK_NOT_EXIST(-2L),
+    ;
   
     private final long value;
   
