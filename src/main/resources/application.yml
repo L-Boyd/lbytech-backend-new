@@ -6,6 +6,8 @@ server:
 spring:
   application:
     name: lbytech_backend_new
+  profiles:
+    active: dev
   
   datasource:
     url: jdbc:mysql://${DB_HOST:localhost}:3306/lbytech_backend_new?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
