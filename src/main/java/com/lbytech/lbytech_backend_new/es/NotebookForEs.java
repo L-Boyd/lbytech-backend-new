@@ -1,5 +1,6 @@
 package com.lbytech.lbytech_backend_new.es;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 // es索引名称为notebook，自动创建索引
 @Document(indexName = "notebook", createIndex = true)
 @Data
+@AllArgsConstructor
 public class NotebookForEs {
 
     // ES 文档ID
