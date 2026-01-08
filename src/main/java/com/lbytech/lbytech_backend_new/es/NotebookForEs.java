@@ -30,9 +30,9 @@ public class NotebookForEs {
     @Field(name = "thumb_count", type = FieldType.Integer)
     private Integer thumbCount;
 
-    @Field(name = "create_time", type = FieldType.Date, pattern = "yyyy-MM-dd HH:mm:ss")
+    @Field(name = "create_time", type = FieldType.Date, format = {}, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
-    @Field(name = "update_time", type = FieldType.Date, pattern = "yyyy-MM-dd HH:mm:ss")
+    @Field(name = "update_time", type = FieldType.Date, format = {}, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 }
