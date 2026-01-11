@@ -29,7 +29,23 @@ class AliOssUtilTest {
      */
     @Test
     void syncNotebookToEs() {
+        List<Notebook> notebookList = notebookService.lambdaQuery().list();
 
+        notebookList.forEach(notebook -> {
+            String fileUrl = notebook.getFileUrl();
+            String content = aliOssUtil.getMdFileContent(fileUrl);
+            content = this.cleanMarkdownFormat(content);
+            NotebookForEs notebookForEs = new NotebookForEs(notebook.getId(),
+                    notebook.getFileName(),
+                    content,
+                    notebook.getFileUrl(),
+                    notebook.getThumbCount(),
+                    notebook.getCreateTime(),
+                    notebook.getUpdateTime());
+            // 同步到ES
+            notebookEsService.save(notebookForEs);
+            log.info("成功同步笔记:{}到ES", notebook.getFileName());
+        });
     }
 
     // 辅助方法：清理markdown格式符号
