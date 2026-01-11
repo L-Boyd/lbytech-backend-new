@@ -2,9 +2,13 @@ package com.lbytech.lbytech_backend_new.mq.pulsar;
 
 import cn.hutool.core.lang.Pair;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.lbytech.lbytech_backend_new.es.INotebookEsService;
+import com.lbytech.lbytech_backend_new.es.NotebookForEs;
 import com.lbytech.lbytech_backend_new.mapper.NotebookMapper;
 import com.lbytech.lbytech_backend_new.mq.ThumbEvent;
+import com.lbytech.lbytech_backend_new.pojo.entity.Notebook;
 import com.lbytech.lbytech_backend_new.pojo.entity.ThumbRecord;
+import com.lbytech.lbytech_backend_new.pojo.vo.NotebookVO;
 import com.lbytech.lbytech_backend_new.service.IThumbRecordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +32,7 @@ public class PulsarThumbRecordConsumer {
 
     private final NotebookMapper notebookMapper;
     private final IThumbRecordService thumbRecordService;
+    private final INotebookEsService notebookEsService;
 
     // 批量处理配置  
     @PulsarListener(
@@ -112,6 +117,12 @@ public class PulsarThumbRecordConsumer {
     public void batchUpdateNotebooks(Map<Integer, Integer> countMap) {
         if (!countMap.isEmpty()) {
             notebookMapper.batchUpdateThumbCount(countMap);
+
+            // 更新到es
+            List<Notebook> notebooks = notebookMapper.selectByIds(countMap.keySet());
+            notebooks.forEach(notebook -> {
+                notebookEsService.updateThumbCount(notebook.getId(), notebook.getThumbCount());
+            });
         }
     }
 
