@@ -1,5 +1,6 @@
 package com.lbytech.lbytech_backend_new.es;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -25,4 +26,13 @@ public interface INotebookEsService {
      * @return 笔记列表
      */
     List<NotebookForEsVO> getNotebookByFileNameContaining(String fileName);
+
+    /**
+     * 根据内容模糊查询笔记
+     * @param content 内容关键词
+     * @param page 页码
+     * @param size 每页数量
+     * @return 分页查询结果
+     */
+    List<NotebookForEsVO> getByContentContaining(String content, int page, int size);
 }

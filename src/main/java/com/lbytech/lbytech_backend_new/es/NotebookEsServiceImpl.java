@@ -1,5 +1,6 @@
 package com.lbytech.lbytech_backend_new.es;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
 import com.lbytech.lbytech_backend_new.exception.BusinessException;
 import com.lbytech.lbytech_backend_new.pojo.Enum.StatusCodeEnum;
@@ -16,13 +17,17 @@ import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -101,7 +106,45 @@ public class NotebookEsServiceImpl implements INotebookEsService {
             List<NotebookForEsVO> notebookForEsVOList = new LinkedList<>();
             for (SearchHit hit : hits) {
                 NotebookForEsVO notebookForEsVO = JSONUtil.toBean(hit.getSourceAsString(), NotebookForEsVO.class);
-                notebookForEsVO.setContent(null);
+                notebookForEsVOList.add(notebookForEsVO);
+            }
+            return notebookForEsVOList;
+        } catch (IOException e) {
+            throw new BusinessException(StatusCodeEnum.FAIL, "ES搜索异常");
+        } finally {
+            afterRequest();
+        }
+    }
+
+    @Override
+    public List<NotebookForEsVO> getByContentContaining(String content, int page, int size) {
+        beforeRequest();
+
+        SearchRequest searchRequest = new SearchRequest("notebook");
+        searchRequest.source()
+                .query(QueryBuilders.matchQuery("content", content))
+                .from((page - 1) * size)
+                .size(size)
+                .highlighter(SearchSourceBuilder.highlight()
+                        .field("content")
+                        .fragmentSize(150));
+
+        try {
+            SearchResponse response = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+            SearchHits searchHits = response.getHits();
+            SearchHit[] hits = searchHits.getHits();
+
+            List<NotebookForEsVO> notebookForEsVOList = new LinkedList<>();
+            for (SearchHit hit : hits) {
+                NotebookForEsVO notebookForEsVO = JSONUtil.toBean(hit.getSourceAsString(), NotebookForEsVO.class);
+
+                // 处理高亮结果
+                Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+                if (CollUtil.isNotEmpty(highlightFields)) {
+                    String highlightedText = highlightFields.get("content").getFragments()[0].toString();
+                    notebookForEsVO.setHighlightContent(highlightedText);
+                }
+
                 notebookForEsVOList.add(notebookForEsVO);
             }
             return notebookForEsVOList;

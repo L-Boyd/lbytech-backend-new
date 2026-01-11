@@ -12,7 +12,9 @@ import java.util.HashMap;
 public enum StatusCodeEnum {
     SUCCESS(200, "操作成功"),
     FAIL(400, "操作失败"),
-    UNAUTHORIZED(401, "未授权");
+    UNAUTHORIZED(401, "未授权"),
+    NOT_FOUND(404, "资源不存在")
+    ;
 
     private int code;
     private String message;
