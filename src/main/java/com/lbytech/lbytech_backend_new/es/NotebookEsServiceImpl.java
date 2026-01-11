@@ -60,4 +60,26 @@ public class NotebookEsServiceImpl implements INotebookEsService {
             }
         }
     }
+
+    @Override
+    public void saveOrUpdate(NotebookForEs notebookForEs) {
+        restHighLevelClient = new RestHighLevelClient(RestClient.builder(
+                HttpHost.create(elasticsearchProperties.getHost())
+        ));
+
+        IndexRequest request = new IndexRequest("notebook")
+                .id(notebookForEs.getId().toString())
+                .source(JSONUtil.toJsonStr(notebookForEs), XContentType.JSON);
+        try {
+            restHighLevelClient.index(request, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            throw new BusinessException(StatusCodeEnum.FAIL, "保存笔记到es失败");
+        } finally {
+            try {
+                restHighLevelClient.close();
+            } catch (IOException e) {
+                log.error("关闭es客户端失败");
+            }
+        }
+    }
 }
