@@ -4,12 +4,16 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
 import com.lbytech.lbytech_backend_new.exception.BusinessException;
 import com.lbytech.lbytech_backend_new.pojo.Enum.StatusCodeEnum;
+import com.lbytech.lbytech_backend_new.pojo.entity.Notebook;
 import com.lbytech.lbytech_backend_new.properties.ElasticsearchProperties;
+import com.lbytech.lbytech_backend_new.service.INotebookService;
+import com.lbytech.lbytech_backend_new.util.AliOssUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -25,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,6 +43,12 @@ public class NotebookEsServiceImpl implements INotebookEsService {
 
     @Autowired
     private ElasticsearchProperties elasticsearchProperties;
+
+    @Autowired
+    private INotebookService notebookService;
+
+    @Autowired
+    private AliOssUtil aliOssUtil;
 
     private RestHighLevelClient restHighLevelClient = null;
 
@@ -74,7 +85,7 @@ public class NotebookEsServiceImpl implements INotebookEsService {
     }
 
     @Override
-    public void saveOrUpdate(NotebookForEs notebookForEs) {
+    public void save(NotebookForEs notebookForEs) {
         beforeRequest();
 
         IndexRequest request = new IndexRequest("notebook")
@@ -84,6 +95,41 @@ public class NotebookEsServiceImpl implements INotebookEsService {
             restHighLevelClient.index(request, RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new BusinessException(StatusCodeEnum.FAIL, "保存笔记到es失败");
+        } finally {
+            afterRequest();
+        }
+    }
+
+    @Override
+    public void updateThumbCount(Integer id, Integer thumbCount) {
+        beforeRequest();
+
+        UpdateRequest request = new UpdateRequest("notebook", id.toString())
+                .doc("thumbCount", thumbCount)
+                .doc("updateTime", LocalDateTime.now());
+        try {
+            restHighLevelClient.update(request, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            throw new BusinessException(StatusCodeEnum.FAIL, "更新笔记点赞数到es失败");
+        } finally {
+            afterRequest();
+        }
+    }
+
+    @Override
+    public void updateContent(Integer id) {
+        beforeRequest();
+
+        Notebook notebook = notebookService.getById(id);
+        String content = aliOssUtil.getMdFileContent(notebook.getFileUrl());
+
+        UpdateRequest request = new UpdateRequest("notebook", id.toString())
+                .doc("content", content)
+                .doc("updateTime", LocalDateTime.now());
+        try {
+            restHighLevelClient.update(request, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            throw new BusinessException(StatusCodeEnum.FAIL, "更新笔记内容到es失败");
         } finally {
             afterRequest();
         }

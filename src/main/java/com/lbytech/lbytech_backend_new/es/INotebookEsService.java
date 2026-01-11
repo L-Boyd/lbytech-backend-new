@@ -14,16 +14,33 @@ public interface INotebookEsService {
 
 
     /**
-     * 保存或更新笔记到Elasticsearch
+     * 保存笔记到Elasticsearch
+     *
      * @param notebookForEs 笔记实体
      */
-    void saveOrUpdate(NotebookForEs notebookForEs);
+    void save(NotebookForEs notebookForEs);
+
+    /**
+     * 更新笔记点赞数到Elasticsearch
+     *
+     * @param id         笔记ID
+     * @param thumbCount 点赞数
+     */
+    void updateThumbCount(Integer id, Integer thumbCount);
+
+    /**
+     * 更新笔记内容到Elasticsearch
+     *
+     * @param id 笔记ID
+     */
+    void updateContent(Integer id);
 
     /**
      * 模糊查询笔记
+     *
      * @param keyword 内容关键词
-     * @param page 页码
-     * @param size 每页数量
+     * @param page    页码
+     * @param size    每页数量
      * @return 分页查询结果
      */
     List<NotebookForEsVO> getByKeywordContaining(String keyword, int page, int size);
