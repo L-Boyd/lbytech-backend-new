@@ -100,6 +100,8 @@ lbytech:
     token-name: token
     # 单位：ms
     ttl-millis: 7200000
+  elasticsearch:
+    host: ${ES_HOST:http://localhost:9200}
 
 logging:
   level:

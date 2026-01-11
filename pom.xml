@@ -120,8 +120,12 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
 
-
-
+        <!--elasticsearch-->
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+            <version>7.17.26</version>
+        </dependency>
     </dependencies>
 
     <build>
