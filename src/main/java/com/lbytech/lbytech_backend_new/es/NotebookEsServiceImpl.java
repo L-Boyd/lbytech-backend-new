@@ -104,9 +104,11 @@ public class NotebookEsServiceImpl implements INotebookEsService {
     public void updateThumbCount(Integer id, Integer thumbCount) {
         beforeRequest();
 
+        Map<String, Object> updateMap = new HashMap<>();
+        updateMap.put("thumbCount", thumbCount);
+        updateMap.put("updateTime", LocalDateTime.now());
         UpdateRequest request = new UpdateRequest("notebook", id.toString())
-                .doc("thumbCount", thumbCount,
-                        "updateTime", LocalDateTime.now());
+                .doc(JSONUtil.toJsonStr(updateMap), XContentType.JSON);
         try {
             restHighLevelClient.update(request, RequestOptions.DEFAULT);
         } catch (IOException e) {
@@ -123,9 +125,11 @@ public class NotebookEsServiceImpl implements INotebookEsService {
         Notebook notebook = notebookService.getById(id);
         String content = aliOssUtil.getMdFileContent(notebook.getFileUrl());
 
+        Map<String, Object> updateMap = new HashMap<>();
+        updateMap.put("content", content);
+        updateMap.put("updateTime", LocalDateTime.now());
         UpdateRequest request = new UpdateRequest("notebook", id.toString())
-                .doc("content", content,
-                        "updateTime", LocalDateTime.now());
+                .doc(JSONUtil.toJsonStr(updateMap), XContentType.JSON);
         try {
             restHighLevelClient.update(request, RequestOptions.DEFAULT);
         } catch (IOException e) {
