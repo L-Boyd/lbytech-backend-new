@@ -14,6 +14,7 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.common.text.Text;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -24,10 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -91,43 +90,21 @@ public class NotebookEsServiceImpl implements INotebookEsService {
     }
 
     @Override
-    public List<NotebookForEsVO> getNotebookByFileNameContaining(String fileName) {
+    public List<NotebookForEsVO> getByKeywordContaining(String keyword, int page, int size) {
         beforeRequest();
 
         SearchRequest searchRequest = new SearchRequest("notebook");
         searchRequest.source()
-                .query(QueryBuilders.matchQuery("fileName", fileName));
-
-        try {
-            SearchResponse response = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-            SearchHits searchHits = response.getHits();
-            SearchHit[] hits = searchHits.getHits();
-
-            List<NotebookForEsVO> notebookForEsVOList = new LinkedList<>();
-            for (SearchHit hit : hits) {
-                NotebookForEsVO notebookForEsVO = JSONUtil.toBean(hit.getSourceAsString(), NotebookForEsVO.class);
-                notebookForEsVOList.add(notebookForEsVO);
-            }
-            return notebookForEsVOList;
-        } catch (IOException e) {
-            throw new BusinessException(StatusCodeEnum.FAIL, "ES搜索异常");
-        } finally {
-            afterRequest();
-        }
-    }
-
-    @Override
-    public List<NotebookForEsVO> getByContentContaining(String content, int page, int size) {
-        beforeRequest();
-
-        SearchRequest searchRequest = new SearchRequest("notebook");
-        searchRequest.source()
-                .query(QueryBuilders.matchQuery("content", content))
+                .query(QueryBuilders.boolQuery()
+                        .should(QueryBuilders.matchQuery("content", keyword))
+                        .should(QueryBuilders.matchQuery("fileName", keyword)))
                 .from((page - 1) * size)
                 .size(size)
                 .highlighter(SearchSourceBuilder.highlight()
                         .field("content")
-                        .fragmentSize(150));
+                        .field("fileName")
+                        .fragmentSize(50)
+                        .numOfFragments(2));
 
         try {
             SearchResponse response = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
@@ -140,10 +117,24 @@ public class NotebookEsServiceImpl implements INotebookEsService {
 
                 // 处理高亮结果
                 Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+                List<String> highlightStringList = new ArrayList<>();
                 if (CollUtil.isNotEmpty(highlightFields)) {
-                    String highlightedText = highlightFields.get("content").getFragments()[0].toString();
-                    notebookForEsVO.setHighlightContent(highlightedText);
+                    HighlightField highlightField1 = highlightFields.get("fileName");
+                    HighlightField highlightField2 = highlightFields.get("content");
+                    if (highlightField1 != null) {
+                        Text[] fragments = highlightField1.getFragments();
+                        for (Text text : fragments) {
+                            highlightStringList.add(text.string());
+                        }
+                    }
+                    if (highlightField2 != null) {
+                        Text[] fragments = highlightField2.getFragments();
+                        for (Text text : fragments) {
+                            highlightStringList.add(text.string());
+                        }
+                    }
                 }
+                notebookForEsVO.setHighlightContent(highlightStringList);
 
                 notebookForEsVOList.add(notebookForEsVO);
             }

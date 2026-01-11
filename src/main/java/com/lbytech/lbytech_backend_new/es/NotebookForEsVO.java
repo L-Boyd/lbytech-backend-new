@@ -18,7 +18,7 @@ public class NotebookForEsVO {
     private String fileName;
 
     // 高亮内容
-    private String highlightContent;
+    private List<String> highlightContent;
 
     private String fileUrl;
 
