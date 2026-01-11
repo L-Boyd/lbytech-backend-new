@@ -2,6 +2,8 @@ package com.lbytech.lbytech_backend_new.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lbytech.lbytech_backend_new.es.INotebookEsService;
+import com.lbytech.lbytech_backend_new.es.NotebookForEs;
 import com.lbytech.lbytech_backend_new.mapper.NotebookMapper;
 import com.lbytech.lbytech_backend_new.pojo.entity.Notebook;
 import com.lbytech.lbytech_backend_new.pojo.entity.ThumbRecord;
@@ -31,6 +33,12 @@ public class NotebookServiceImpl extends ServiceImpl<NotebookMapper, Notebook> i
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
+    @Autowired
+    private INotebookEsService notebookEsService;
+
+    @Autowired
+    private AliOssUtil AliOssUtil;
+
     @Override
     public String uploadFile(MultipartFile file) {
         String url = aliOssUtil.uploadFile(file);
@@ -42,6 +50,14 @@ public class NotebookServiceImpl extends ServiceImpl<NotebookMapper, Notebook> i
             this.save(notebook);
             stringRedisTemplate.opsForSet()
                     .add("notebook:id_set", String.valueOf(notebook.getId()));
+
+            // 保存到es
+            NotebookForEs notebookForEs = BeanUtil.copyProperties(notebook, NotebookForEs.class);
+            notebookForEs.setContent(aliOssUtil.getMdFileContent(url));
+
+            notebookEsService.save(notebookForEs);
+        } else {
+            notebookEsService.updateContent(notebook.getId());
         }
         return url;
     }
