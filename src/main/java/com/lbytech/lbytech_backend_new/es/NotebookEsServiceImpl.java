@@ -105,8 +105,8 @@ public class NotebookEsServiceImpl implements INotebookEsService {
         beforeRequest();
 
         UpdateRequest request = new UpdateRequest("notebook", id.toString())
-                .doc("thumbCount", thumbCount)
-                .doc("updateTime", LocalDateTime.now());
+                .doc("thumbCount", thumbCount,
+                        "updateTime", LocalDateTime.now());
         try {
             restHighLevelClient.update(request, RequestOptions.DEFAULT);
         } catch (IOException e) {
@@ -124,8 +124,8 @@ public class NotebookEsServiceImpl implements INotebookEsService {
         String content = aliOssUtil.getMdFileContent(notebook.getFileUrl());
 
         UpdateRequest request = new UpdateRequest("notebook", id.toString())
-                .doc("content", content)
-                .doc("updateTime", LocalDateTime.now());
+                .doc("content", content,
+                        "updateTime", LocalDateTime.now());
         try {
             restHighLevelClient.update(request, RequestOptions.DEFAULT);
         } catch (IOException e) {
