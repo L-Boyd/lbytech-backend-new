@@ -34,7 +34,6 @@ class AliOssUtilTest {
         notebookList.forEach(notebook -> {
             String fileUrl = notebook.getFileUrl();
             String content = aliOssUtil.getMdFileContent(fileUrl);
-            content = this.cleanMarkdownFormat(content);
             NotebookForEs notebookForEs = new NotebookForEs(notebook.getId(),
                     notebook.getFileName(),
                     content,
@@ -46,18 +45,5 @@ class AliOssUtilTest {
             notebookEsService.save(notebookForEs);
             log.info("成功同步笔记:{}到ES", notebook.getFileName());
         });
-    }
-
-    // 辅助方法：清理markdown格式符号
-    private String cleanMarkdownFormat(String content) {
-        if (content == null) return "";
-        // 去掉标题符号、加粗符号、代码块、链接等，仅保留纯文本
-        return content.replaceAll("#+\\s?", "")       // 去掉## 标题
-                .replaceAll("\\*\\*(.+?)\\*\\*", "$1") // 去掉**加粗**，保留内容
-                .replaceAll("`(.+?)`", "$1")    // 去掉`行内代码`，保留内容
-                .replaceAll("```[\\s\\S]*?```", "") // 去掉```代码块
-                .replaceAll("!\\[.*?\\]\\(.*?\\)", "") // 去掉图片
-                .replaceAll("\\[(.+?)\\]\\(.*?\\)", "$1") // 去掉链接，保留文字
-                .trim();
     }
 }
