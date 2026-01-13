@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux;
         wiringMode = AiServiceWiringMode.EXPLICIT,
         streamingChatModel = "openAiStreamingChatModel"
 )
-public interface LbyTechAiService {
+public interface LbytechAiService {
 
     /**
      * 测试流式聊天

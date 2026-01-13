@@ -1,7 +1,5 @@
 package com.lbytech.lbytech_backend_new.ai;
 
-import com.lbytech.lbytech_backend_new.pojo.vo.BaseResponse;
-import com.lbytech.lbytech_backend_new.util.ResultUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,7 @@ import reactor.core.publisher.Flux;
 public class AiController {
 
     @Autowired
-    private LbyTechAiService lbyTechAiService;
+    private LbytechAiService lbyTechAiService;
 
     @PostMapping("/testChat")
     @Operation(summary = "测试聊天", description = "测试聊天功能")   // springdoc描述方法
