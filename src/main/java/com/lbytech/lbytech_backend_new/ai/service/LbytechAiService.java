@@ -1,4 +1,4 @@
-package com.lbytech.lbytech_backend_new.ai;
+package com.lbytech.lbytech_backend_new.ai.service;
 
 import dev.langchain4j.service.spring.AiService;
 import dev.langchain4j.service.spring.AiServiceWiringMode;
@@ -6,7 +6,8 @@ import reactor.core.publisher.Flux;
 
 @AiService(
         wiringMode = AiServiceWiringMode.EXPLICIT,
-        streamingChatModel = "openAiStreamingChatModel"
+        streamingChatModel = "openAiStreamingChatModel",
+        chatMemoryProvider = "chatMemoryProvider"
 )
 public interface LbytechAiService {
 
