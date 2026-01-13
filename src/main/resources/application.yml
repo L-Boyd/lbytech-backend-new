@@ -106,6 +106,14 @@ lbytech:
     token-name: token
     # 单位：ms
     ttl-millis: 7200000
+  rag:
+    postgres:
+      host: ${PG_HOST:localhost}
+      port: 5432
+      database: lbytech
+      username: ${PG_USERNAME:postgres}
+      password: ${PG_PASSWORD:password}
+      table: rag_embeddings
 
 logging:
   level:
@@ -135,3 +143,11 @@ langchain4j:
       model-name: deepseek-chat
       log-requests: true
       log-responses: true
+    embedding-model:
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api-key: ${EMBEDDING_API_KEY}
+      model-name: ${AI_EMBEDDING_MODEL_NAME:text-embedding-v4}
+      log-requests: ${AI_LOG_REQUESTS:true}
+      log-responses: ${AI_LOG_RESPONSES:true}
+      max-segments-per-batch: 10
+      dimensions: 1536

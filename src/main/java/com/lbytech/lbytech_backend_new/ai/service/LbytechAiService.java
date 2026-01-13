@@ -7,7 +7,8 @@ import reactor.core.publisher.Flux;
 @AiService(
         wiringMode = AiServiceWiringMode.EXPLICIT,
         streamingChatModel = "openAiStreamingChatModel",
-        chatMemoryProvider = "chatMemoryProvider"
+        chatMemoryProvider = "chatMemoryProvider",
+        contentRetriever = "contentRetriever"
 )
 public interface LbytechAiService {
 

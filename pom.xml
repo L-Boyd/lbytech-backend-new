@@ -150,6 +150,19 @@
             <artifactId>langchain4j-reactor</artifactId>
             <version>1.10.0-beta18</version>
         </dependency>
+
+        <!--rag-->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-easy-rag</artifactId>
+            <version>1.10.0-beta18</version>
+        </dependency>
+        <!--rag存储到postgres sql-->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-pgvector</artifactId>
+            <version>1.10.0-beta18</version>
+        </dependency>
     </dependencies>
 
     <build>
