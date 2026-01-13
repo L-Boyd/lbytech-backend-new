@@ -30,10 +30,6 @@ spring:
       password: ${REDIS_PASSWORD:1234}
       database: 1
 
-  elasticsearch:
-    uris: ${ES_URIS:http://localhost:9200}
-    connection-timeout: 5s
-
   mail:
     host: ${MAIL_HOST:smtp.163.com}
     port: ${MAIL_PORT:465}
@@ -108,8 +104,6 @@ lbytech:
     token-name: token
     # 单位：ms
     ttl-millis: 7200000
-  elasticsearch:
-    host: ${ES_HOST:http://localhost:9200}
 
 logging:
   level:

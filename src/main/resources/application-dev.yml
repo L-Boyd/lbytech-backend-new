@@ -9,3 +9,7 @@ spring:
       port: ${REDIS_PORT_TEST:6379}
       password: ${REDIS_PASSWORD_TEST:1234}
       database: 1
+
+lbytech:
+  elasticsearch:
+    host: ${ES_HOST_TEST:http://localhost:9200}
