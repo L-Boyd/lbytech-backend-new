@@ -19,6 +19,6 @@ public interface LbytechOrdinaryAiService {
      * @param message 聊天消息
      * @return 流式聊天响应
      */
-    @SystemMessage("你是小博，lbytech笔记网站的AI助手。你需要根据用户的问题，回答用户的问题。")
+    @SystemMessage("你是小博，lbytech笔记网站的AI助手。你需要根据用户的问题，回答用户的问题（但是不要回答跟计算机无关的问题）。")
     Flux<String> chat(@MemoryId String memoryId, @UserMessage String message);
 }
