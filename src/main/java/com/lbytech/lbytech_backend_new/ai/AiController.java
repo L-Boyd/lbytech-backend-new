@@ -1,6 +1,9 @@
 package com.lbytech.lbytech_backend_new.ai;
 
-import com.lbytech.lbytech_backend_new.ai.service.LbytechAiService;
+import com.lbytech.lbytech_backend_new.ai.service.LbytechOrdinaryAiService;
+import com.lbytech.lbytech_backend_new.ai.service.LbytechRAGAiService;
+import com.lbytech.lbytech_backend_new.pojo.vo.UserVO;
+import com.lbytech.lbytech_backend_new.util.UserHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +19,22 @@ import reactor.core.publisher.Flux;
 public class AiController {
 
     @Autowired
-    private LbytechAiService lbyTechAiService;
+    private LbytechOrdinaryAiService lbyTechOrdinaryAiService;
 
-    @PostMapping("/testChat")
-    @Operation(summary = "测试聊天", description = "测试聊天功能")   // springdoc描述方法
+    @Autowired
+    private LbytechRAGAiService lbyTechRAGAiService;
+
+    @PostMapping("/chat")
+    @Operation(summary = "普通聊天", description = "普通聊天功能")   // springdoc描述方法
     public Flux<String> chat(@RequestBody AiChatRequestForm aiChatRequestForm) {
-        return lbyTechAiService.testChat(aiChatRequestForm.getMessage());
+        UserVO user = UserHolder.getUser();
+        return lbyTechOrdinaryAiService.chat(user.getEmail(), aiChatRequestForm.getMessage());
+    }
+
+    @PostMapping("/chatWithRAG")
+    @Operation(summary = "RAG聊天", description = "RAG聊天功能")   // springdoc描述方法
+    public Flux<String> chatWithRAG(@RequestBody AiChatRequestForm aiChatRequestForm) {
+        UserVO user = UserHolder.getUser();
+        return lbyTechRAGAiService.chatWithRag(user.getEmail(), aiChatRequestForm.getMessage());
     }
 }
