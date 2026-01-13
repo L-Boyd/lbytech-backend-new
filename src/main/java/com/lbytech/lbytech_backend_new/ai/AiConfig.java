@@ -1,10 +1,13 @@
 package com.lbytech.lbytech_backend_new.ai;
 
+import com.lbytech.lbytech_backend_new.ai.properties.DeepseekProperties;
 import com.lbytech.lbytech_backend_new.ai.properties.LbytechEmbeddingStoreProperties;
+import com.lbytech.lbytech_backend_new.ai.properties.QwenProperties;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.store.embedding.EmbeddingStore;
@@ -72,6 +75,32 @@ public class AiConfig {
                 .minScore(0.5)  // 最小的可选入的预选相似度值
                 .maxResults(3)  // 最多可查询出的片段
                 .embeddingModel(embeddingModel)
+                .build();
+    }
+
+    // DeepSeek模型配置
+    @Bean
+    public OpenAiStreamingChatModel deepSeekChatModel(DeepseekProperties deepseekProperties) {
+        return dev.langchain4j.model.openai.OpenAiStreamingChatModel.builder()
+                .baseUrl(deepseekProperties.getBaseUrl())
+                .apiKey(deepseekProperties.getApiKey())
+                .modelName(deepseekProperties.getModelName())
+                .maxTokens(deepseekProperties.getMaxTokens())
+                .logRequests(deepseekProperties.isLogRequests())
+                .logResponses(deepseekProperties.isLogResponses())
+                .build();
+    }
+
+    // Qwen模型配置
+    @Bean("qwenChatModel")
+    public OpenAiStreamingChatModel qwenChatModel(QwenProperties qwenProperties) {
+        return dev.langchain4j.model.openai.OpenAiStreamingChatModel.builder()
+                .baseUrl(qwenProperties.getBaseUrl())
+                .apiKey(qwenProperties.getApiKey())
+                .modelName(qwenProperties.getModelName())
+                .maxTokens(qwenProperties.getMaxTokens())
+                .logRequests(qwenProperties.isLogRequests())
+                .logResponses(qwenProperties.isLogResponses())
                 .build();
     }
 }

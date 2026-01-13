@@ -114,6 +114,21 @@ lbytech:
       username: ${PG_USERNAME:postgres}
       password: ${PG_PASSWORD:password}
       table: rag_embeddings
+  model:
+    deepseek:
+      base-url: https://api.deepseek.com
+      api-key: ${DEEPSEEK_API_KEY}
+      model-name: ${DEEPSEEK_AI_MODEL_NAME:deepseek-chat}
+      log-requests: true
+      log-responses: true
+      max-tokens: 5000
+    qwen:
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api-key: ${QWEN_API_KEY}
+      model-name: ${QWEN_AI_MODEL_NAME:qwen3-max-preview}
+      log-requests: true
+      log-responses: true
+      max-tokens: 5000
 
 logging:
   level:
@@ -137,13 +152,6 @@ management:
 
 langchain4j:
   open-ai:
-    streaming-chat-model:
-      base-url: https://api.deepseek.com
-      api-key: ${AI_API_KEY}
-      model-name: deepseek-chat
-      log-requests: true
-      log-responses: true
-      max-tokens: 5000
     embedding-model:
       base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
       api-key: ${EMBEDDING_API_KEY}

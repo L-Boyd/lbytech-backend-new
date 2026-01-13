@@ -1,4 +1,4 @@
-package com.lbytech.lbytech_backend_new.ai.service;
+package com.lbytech.lbytech_backend_new.ai.service.aiService.qwen;
 
 import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;
@@ -9,10 +9,10 @@ import reactor.core.publisher.Flux;
 
 @AiService(
         wiringMode = AiServiceWiringMode.EXPLICIT,
-        streamingChatModel = "openAiStreamingChatModel",
+        streamingChatModel = "qwenChatModel",
         chatMemoryProvider = "chatMemoryProvider"
 )
-public interface LbytechOrdinaryAiService {
+public interface QwenOrdinaryAiService {
 
     /**
      * 普通流式聊天
