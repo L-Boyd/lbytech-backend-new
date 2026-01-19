@@ -48,3 +48,30 @@ CREATE TABLE `chat_memory` (
                                PRIMARY KEY (`id`),
                                INDEX `idx_session_id` (`session_id`)
 ) COMMENT='对话记忆表';
+
+
+CREATE TABLE `comment_info` (
+                                    `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+                                    `user_email` bigint unsigned NOT NULL COMMENT '用户Email',
+                                    `notebook_id` bigint unsigned NOT NULL COMMENT '笔记id',
+                                    `parent_id` bigint unsigned NOT NULL COMMENT '关联的1级评论id，如果是一级评论，则值为0',
+                                    `answer_id` bigint unsigned NOT NULL COMMENT '回复的评论id，非回复评论则为0',
+                                    `like_count` int unsigned DEFAULT NULL COMMENT '点赞数',
+                                    `status` tinyint unsigned DEFAULT NULL COMMENT '状态，0：审核中，1：正常，2：禁止查看, 3：删除',
+                                    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                                    `is_delete` tinyint unsigned DEFAULT 0 COMMENT '逻辑删除字段，0：未删除，1：已删除',
+                                    PRIMARY KEY (`id`)
+) COMMENT = '评论信息表';
+
+CREATE TABLE `comment_contents` (
+                                    `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+                                    `comment_id` bigint unsigned NOT NULL COMMENT '关联的评论ID',
+                                    `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '评论内容',
+                                    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                                    `is_delete` tinyint unsigned DEFAULT 0 COMMENT '逻辑删除字段，0：未删除，1：已删除',
+                                    PRIMARY KEY (`id`),
+                                    UNIQUE KEY `uk_comment_id` (`comment_id`),
+                                    CONSTRAINT `fk_comment_content_comment` FOREIGN KEY (`comment_id`) REFERENCES `comment_info` (`id`)
+) COMMENT = '评论内容表';
