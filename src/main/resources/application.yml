@@ -160,3 +160,8 @@ langchain4j:
       log-responses: ${AI_LOG_RESPONSES:true}
       max-segments-per-batch: 10
       dimensions: 1536
+
+rocketmq:
+  name-server: ${ROCKETMQ_NAME_SERVER:localhost:9876}
+  producer:
+    group: lbytech-producer-group
