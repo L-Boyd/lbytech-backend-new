@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
         topic = "thumb-topic",
         consumerGroup = "thumb-consumer-group"
 )
-@Component
+//@Component
 public class RocketThumbRecordConsumer implements RocketMQListener<ThumbEvent> {
 
     @Autowired
