@@ -11,6 +11,7 @@ public interface INotebookService extends IService<Notebook> {
 
     /**
      * 上传文件
+     *
      * @param file 文件
      * @return 上传后的文件路径
      */
@@ -23,10 +24,19 @@ public interface INotebookService extends IService<Notebook> {
      */
     List<NotebookVO> getFileList();
 
-     /**
-      * 根据id获取笔记详情
-      * @param id 文件id
-      * @return 文件详情
-      */
+    /**
+     * 根据id获取笔记详情
+     *
+     * @param id 文件id
+     * @return 文件详情
+     */
     NotebookVO getFileById(Integer id);
+
+    /**
+     * 更新点赞数
+     *
+     * @param id    文件id
+     * @param increment 点赞数增量
+     */
+    void updateThumbCount(Integer id, Integer increment);
 }

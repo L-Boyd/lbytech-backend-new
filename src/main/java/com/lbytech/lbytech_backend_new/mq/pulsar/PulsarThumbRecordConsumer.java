@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-@Service
+//@Service
 @RequiredArgsConstructor
 @Slf4j
 public class PulsarThumbRecordConsumer {
@@ -34,7 +34,7 @@ public class PulsarThumbRecordConsumer {
     private final IThumbRecordService thumbRecordService;
     private final INotebookEsService notebookEsService;
 
-    // 批量处理配置  
+    // 批量处理配置
     @PulsarListener(
             subscriptionName = "thumb-subscription",
             topics = "thumb-topic",

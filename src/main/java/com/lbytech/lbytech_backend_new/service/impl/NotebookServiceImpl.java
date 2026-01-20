@@ -98,4 +98,12 @@ public class NotebookServiceImpl extends ServiceImpl<NotebookMapper, Notebook> i
         return notebookVO;
     }
 
+    @Override
+    public void updateThumbCount(Integer id, Integer increment) {
+        Notebook notebook = this.getById(id);
+        this.lambdaUpdate()
+                .set(Notebook::getThumbCount, notebook.getThumbCount() + increment)
+                .eq(Notebook::getId, id)
+                .update();
+    }
 }
