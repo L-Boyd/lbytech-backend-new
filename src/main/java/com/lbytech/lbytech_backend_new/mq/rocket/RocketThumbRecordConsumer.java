@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
         topic = "thumb-topic",
         consumerGroup = "thumb-consumer-group"
 )
-@Component
+//@Component
 public class RocketThumbRecordConsumer implements RocketMQListener<ThumbEvent> {
 
     @Autowired
@@ -28,33 +28,31 @@ public class RocketThumbRecordConsumer implements RocketMQListener<ThumbEvent> {
 
     @Override
     public synchronized void onMessage(ThumbEvent thumbEvent) {
-        Thread.startVirtualThread(() -> {
-            ThumbEvent.EventType type = thumbEvent.getType();
-            if (type == ThumbEvent.EventType.INCR) {
-                // 点赞
-                // 新增点赞记录
-                ThumbRecord thumbRecord = new ThumbRecord();
-                thumbRecord.setNotebookId(thumbEvent.getNotebookId());
-                thumbRecord.setUserEmail(thumbEvent.getUserEmail());
-                thumbRecordService.save(thumbRecord);
+        ThumbEvent.EventType type = thumbEvent.getType();
+        if (type == ThumbEvent.EventType.INCR) {
+            // 点赞
+            // 新增点赞记录
+            ThumbRecord thumbRecord = new ThumbRecord();
+            thumbRecord.setNotebookId(thumbEvent.getNotebookId());
+            thumbRecord.setUserEmail(thumbEvent.getUserEmail());
+            thumbRecordService.save(thumbRecord);
 
-                // 更新笔记点赞数
-                notebookService.updateThumbCount(thumbEvent.getNotebookId(), 1);
-                // 更新es
-                notebookEsService.updateThumbCount(thumbEvent.getNotebookId(), notebookService.getById(thumbEvent.getNotebookId()).getThumbCount());
-            } else {
-                // 取消点赞
-                // 删除点赞记录
-                thumbRecordService.lambdaUpdate()
-                        .eq(ThumbRecord::getNotebookId, thumbEvent.getNotebookId())
-                        .eq(ThumbRecord::getUserEmail, thumbEvent.getUserEmail())
-                        .remove();
+            // 更新笔记点赞数
+            notebookService.updateThumbCount(thumbEvent.getNotebookId(), 1);
+            // 更新es
+            notebookEsService.updateThumbCount(thumbEvent.getNotebookId(), notebookService.getById(thumbEvent.getNotebookId()).getThumbCount());
+        } else {
+            // 取消点赞
+            // 删除点赞记录
+            thumbRecordService.lambdaUpdate()
+                    .eq(ThumbRecord::getNotebookId, thumbEvent.getNotebookId())
+                    .eq(ThumbRecord::getUserEmail, thumbEvent.getUserEmail())
+                    .remove();
 
-                // 更新笔记点赞数
-                notebookService.updateThumbCount(thumbEvent.getNotebookId(), -1);
-                // 更新es
-                notebookEsService.updateThumbCount(thumbEvent.getNotebookId(), notebookService.getById(thumbEvent.getNotebookId()).getThumbCount());
-            }
-        });
+            // 更新笔记点赞数
+            notebookService.updateThumbCount(thumbEvent.getNotebookId(), -1);
+            // 更新es
+            notebookEsService.updateThumbCount(thumbEvent.getNotebookId(), notebookService.getById(thumbEvent.getNotebookId()).getThumbCount());
+        }
     }
 }
