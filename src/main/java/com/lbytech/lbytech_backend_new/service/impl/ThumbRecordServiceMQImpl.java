@@ -31,9 +31,9 @@ public class ThumbRecordServiceMQImpl extends ServiceImpl<ThumbRecordMapper, Thu
 
     private final StringRedisTemplate redisTemplate;
 
-    private final PulsarTemplate<ThumbEvent> pulsarTemplate;
+    //private final PulsarTemplate<ThumbEvent> pulsarTemplate;
 
-    //private final RocketMQTemplate rocketMQTemplate;
+    private final RocketMQTemplate rocketMQTemplate;
 
     @Override
     public Boolean thumbNotebook(Integer notebookId) {
@@ -64,13 +64,13 @@ public class ThumbRecordServiceMQImpl extends ServiceImpl<ThumbRecordMapper, Thu
                 .type(ThumbEvent.EventType.INCR)
                 .eventTime(LocalDateTime.now())
                 .build();
-        pulsarTemplate.sendAsync("thumb-topic", thumbEvent)
+        /*pulsarTemplate.sendAsync("thumb-topic", thumbEvent)
                 .exceptionally(ex -> {
                     redisTemplate.opsForHash().delete(userThumbKey, notebookId.toString(), true);
                     log.error("点赞事件发送失败: userEmail={}, notebookId={}", userEmail, notebookId, ex);
                     return null;
-                });
-        /*rocketMQTemplate.asyncSend("thumb-topic", thumbEvent, new SendCallback() {
+                });*/
+        rocketMQTemplate.asyncSend("thumb-topic", thumbEvent, new SendCallback() {
             @Override
             public void onSuccess(SendResult sendResult) {
                 log.info("点赞事件发送成功: userEmail={}, notebookId={}", userEmail, notebookId);
@@ -81,9 +81,7 @@ public class ThumbRecordServiceMQImpl extends ServiceImpl<ThumbRecordMapper, Thu
                 redisTemplate.opsForHash().delete(userThumbKey, notebookId.toString(), true);
                 log.error("点赞事件发送失败: userEmail={}, notebookId={}", userEmail, notebookId, throwable);
             }
-        });*/
-
-
+        });
 
         return true;
     }
@@ -113,13 +111,13 @@ public class ThumbRecordServiceMQImpl extends ServiceImpl<ThumbRecordMapper, Thu
                 .type(ThumbEvent.EventType.DECR)
                 .eventTime(LocalDateTime.now())
                 .build();
-        pulsarTemplate.sendAsync("thumb-topic", thumbEvent)
+        /*pulsarTemplate.sendAsync("thumb-topic", thumbEvent)
                 .exceptionally(ex -> {
                     redisTemplate.opsForHash().put(userThumbKey, notebookId.toString(), true);
                     log.error("点赞事件发送失败: userEmail={}, notebookId={}", userEmail, notebookId, ex);
                     return null;
-                });
-        /*rocketMQTemplate.asyncSend("thumb-topic", thumbEvent, new SendCallback() {
+                });*/
+        rocketMQTemplate.asyncSend("thumb-topic", thumbEvent, new SendCallback() {
             @Override
             public void onSuccess(SendResult sendResult) {
                 log.info("取消点赞事件发送成功: userEmail={}, notebookId={}", userEmail, notebookId);
@@ -130,9 +128,7 @@ public class ThumbRecordServiceMQImpl extends ServiceImpl<ThumbRecordMapper, Thu
                 redisTemplate.opsForHash().put(userThumbKey, notebookId.toString(), true);
                 log.error("取消点赞事件发送失败: userEmail={}, notebookId={}", userEmail, notebookId, throwable);
             }
-        });*/
-
-
+        });
 
         return true;
     }
