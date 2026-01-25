@@ -1,5 +1,6 @@
 package com.lbytech.lbytech_backend_new.ai.service.strategy;
 
+import com.lbytech.lbytech_backend_new.ai.pojo.ChatModelEnum;
 import reactor.core.publisher.Flux;
 
 /**
@@ -8,4 +9,6 @@ import reactor.core.publisher.Flux;
 public interface AiServiceStrategy {
     Flux<String> chat(String memoryId, String message);
     Flux<String> chatWithRAG(String memoryId, String message);
+
+    ChatModelEnum getModel();
 }

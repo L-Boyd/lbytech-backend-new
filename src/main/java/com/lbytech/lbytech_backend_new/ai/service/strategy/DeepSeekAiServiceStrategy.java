@@ -1,5 +1,6 @@
 package com.lbytech.lbytech_backend_new.ai.service.strategy;
 
+import com.lbytech.lbytech_backend_new.ai.pojo.ChatModelEnum;
 import com.lbytech.lbytech_backend_new.ai.service.aiService.deepseek.DeepseekOrdinaryAiService;
 import com.lbytech.lbytech_backend_new.ai.service.aiService.deepseek.DeepseekRAGAiService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,5 +24,10 @@ public class DeepSeekAiServiceStrategy implements AiServiceStrategy {
     @Override
     public Flux<String> chatWithRAG(String memoryId, String message) {
         return deepSeekRAGAiService.chatWithRag(memoryId, message);
+    }
+
+    @Override
+    public ChatModelEnum getModel() {
+        return ChatModelEnum.DEEPSEEK;
     }
 }

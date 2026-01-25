@@ -1,5 +1,6 @@
 package com.lbytech.lbytech_backend_new.ai.service.strategy;
 
+import com.lbytech.lbytech_backend_new.ai.pojo.ChatModelEnum;
 import com.lbytech.lbytech_backend_new.ai.service.aiService.qwen.QwenOrdinaryAiService;
 import com.lbytech.lbytech_backend_new.ai.service.aiService.qwen.QwenRAGAiService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,5 +24,10 @@ public class QwenAiServiceStrategy implements AiServiceStrategy {
     @Override
     public Flux<String> chatWithRAG(String memoryId, String message) {
         return qwenRAGAiService.chatWithRag(memoryId, message);
+    }
+
+    @Override
+    public ChatModelEnum getModel() {
+        return ChatModelEnum.QWEN;
     }
 }

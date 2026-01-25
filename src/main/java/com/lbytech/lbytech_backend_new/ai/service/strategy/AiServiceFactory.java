@@ -5,30 +5,32 @@ import com.lbytech.lbytech_backend_new.exception.BusinessException;
 import com.lbytech.lbytech_backend_new.pojo.Enum.StatusCodeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
- * 支付策略工厂类（可选，企业级优化）
+ * 支付策略工厂类
  * 封装策略的创建逻辑，客户端只传标识，无需手动new策略对象
  */
 @Component
 public class AiServiceFactory {
 
-    private static DeepSeekAiServiceStrategy deepSeekAiServiceStrategy;
+    private static final Map<ChatModelEnum, AiServiceStrategy> aiServiceMap = new HashMap<>();
 
-    private static QwenAiServiceStrategy qwenAiServiceStrategy;
-
-    public AiServiceFactory(DeepSeekAiServiceStrategy deepSeekAiServiceStrategy, QwenAiServiceStrategy qwenAiServiceStrategy) {
-        this.deepSeekAiServiceStrategy = deepSeekAiServiceStrategy;
-        this.qwenAiServiceStrategy = qwenAiServiceStrategy;
+    public AiServiceFactory(List<AiServiceStrategy> strategyList) {
+        strategyList.forEach(strategy -> {
+            aiServiceMap.put(strategy.getModel(), strategy);
+        });
     }
 
     // 根据支付类型，返回对应的支付策略
     public static AiServiceStrategy getStrategy(ChatModelEnum model) {
-        if (model == ChatModelEnum.DEEPSEEK) {
-            return deepSeekAiServiceStrategy;
-        } else if (model == ChatModelEnum.QWEN) {
-            return qwenAiServiceStrategy;
-        } else {
+        AiServiceStrategy strategy = aiServiceMap.get(model);
+        if (strategy == null) {
             throw new BusinessException(StatusCodeEnum.FAIL, "不支持的模型：" + model);
         }
+        return strategy;
     }
 }
