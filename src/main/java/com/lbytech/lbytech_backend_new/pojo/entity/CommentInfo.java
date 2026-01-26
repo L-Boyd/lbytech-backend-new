@@ -15,13 +15,11 @@ public class CommentInfo {
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private Long userEmail; // 用户Email
+    private String userEmail; // 用户Email
 
-    private Long notebookId; // 笔记id
+    private Integer notebookId; // 笔记id
 
     private Long parentId; // 关联的1级评论id，如果是一级评论，则值为0
-
-    private Long answerId; // 回复的评论id，非回复评论则为0
 
     private Integer likeCount; // 点赞数
 
@@ -31,5 +29,5 @@ public class CommentInfo {
 
     private LocalDateTime updateTime; // 更新时间
 
-    private Integer isDelete; // 逻辑删除字段，0：未删除，1：已删除
+    private Integer isDeleted; // 逻辑删除字段，0：未删除，1：已删除
 }
