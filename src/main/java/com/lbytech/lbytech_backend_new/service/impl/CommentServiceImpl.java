@@ -124,7 +124,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentInfoMapper, CommentIn
             commentInfo.setStatus(CommentStatusEnum.REJECTED.getCode());
             commentInfoService.updateById(commentInfo);
         } else if (commentReviewResult.getResult().equals("模糊")) {
-            commentInfo.setStatus(CommentStatusEnum.PENDING.getCode());
+            commentInfo.setStatus(CommentStatusEnum.AMBIGUOUS.getCode());
             commentInfoService.updateById(commentInfo);
 
             // 通知人工审核
