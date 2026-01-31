@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
         topic = "test-topic1",
         consumerGroup = "lbytech-consumer-group"
 )
-@Component
+//@Component
 public class TestConsumer implements RocketMQListener<String> {
 
     @Override

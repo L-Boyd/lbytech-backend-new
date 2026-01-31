@@ -163,7 +163,7 @@ langchain4j:
       max-segments-per-batch: 10
       dimensions: 1536
 
-rocketmq:
-  name-server: ${ROCKETMQ_NAME_SERVER:localhost:9876}
-  producer:
-    group: lbytech-producer-group
+#rocketmq:
+#  name-server: ${ROCKETMQ_NAME_SERVER:localhost:9876}
+#  producer:
+#    group: lbytech-producer-group
