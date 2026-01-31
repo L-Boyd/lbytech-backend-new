@@ -74,3 +74,15 @@ CREATE TABLE `comment_contents` (
                                     UNIQUE KEY `uk_comment_id` (`comment_id`),
                                     CONSTRAINT `fk_comment_content_comment` FOREIGN KEY (`comment_id`) REFERENCES `comment_info` (`id`)
 ) COMMENT = '评论内容表';
+
+CREATE TABLE `comment_review_result` (
+                                         `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                                         `comment_id` bigint NOT NULL COMMENT '关联的评论ID',
+                                         `result` varchar(10) NOT NULL COMMENT '审核结果：合规、违规、模糊',
+                                         `confidence` double NOT NULL COMMENT '审核置信度，0-1之间的浮点数',
+                                         `reason` text COMMENT '审核原因，对审核结果的解释',
+                                         `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                         `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                                         PRIMARY KEY (`id`),
+                                         UNIQUE KEY `uk_comment_id` (`comment_id`)
+) COMMENT='评论审核结果表';

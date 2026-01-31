@@ -162,6 +162,13 @@ langchain4j:
       log-responses: ${AI_LOG_RESPONSES:true}
       max-segments-per-batch: 10
       dimensions: 1536
+    chat-model:
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api-key: ${QWEN_API_KEY}
+      model-name: ${AI_CHAT_MODEL_NAME:qwen3-max-preview}
+      log-requests: ${AI_LOG_REQUESTS:true}
+      log-responses: ${AI_LOG_RESPONSES:true}
+      max-tokens: 5000
 
 #rocketmq:
 #  name-server: ${ROCKETMQ_NAME_SERVER:localhost:9876}

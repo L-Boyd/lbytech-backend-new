@@ -1,6 +1,10 @@
 package com.lbytech.lbytech_backend_new.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lbytech.lbytech_backend_new.ai.pojo.CommentReviewResult;
+import com.lbytech.lbytech_backend_new.ai.pojo.CommentReviewResultForDB;
+import com.lbytech.lbytech_backend_new.ai.service.aiService.CommentReviewAiService;
 import com.lbytech.lbytech_backend_new.exception.BusinessException;
 import com.lbytech.lbytech_backend_new.mapper.CommentInfoMapper;
 import com.lbytech.lbytech_backend_new.pojo.Enum.CommentStatusEnum;
@@ -10,11 +14,8 @@ import com.lbytech.lbytech_backend_new.pojo.dto.CommentRequest;
 import com.lbytech.lbytech_backend_new.pojo.entity.CommentContent;
 import com.lbytech.lbytech_backend_new.pojo.entity.CommentInfo;
 import com.lbytech.lbytech_backend_new.pojo.vo.UserVO;
-import com.lbytech.lbytech_backend_new.service.ICommentContentService;
-import com.lbytech.lbytech_backend_new.service.ICommentInfoService;
-import com.lbytech.lbytech_backend_new.service.ICommentService;
+import com.lbytech.lbytech_backend_new.service.*;
 import com.lbytech.lbytech_backend_new.util.UserHolder;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,15 @@ public class CommentServiceImpl extends ServiceImpl<CommentInfoMapper, CommentIn
 
     @Autowired
     private ICommentContentService commentContentService;
+
+    @Autowired
+    private CommentReviewAiService commentReviewAiService;
+
+    @Autowired
+    private ICommentReviewResultService commentReviewResultService;
+
+    @Autowired
+    private IMailService mailService;
 
     @Override
     @Transactional
@@ -63,6 +73,9 @@ public class CommentServiceImpl extends ServiceImpl<CommentInfoMapper, CommentIn
 
         // 插入评论内容
         commentContentService.insertCommentContent(commentContent);
+
+        // 评论审核
+        Thread.startVirtualThread(() -> reviewComment(commentContent.getId()));
     }
 
     @Override
@@ -79,5 +92,30 @@ public class CommentServiceImpl extends ServiceImpl<CommentInfoMapper, CommentIn
     public List<CommentInfo> getCommentsByNotebookId(Long notebookId, Integer pageNum, Integer pageSize) {
         // TODO 分页查询评论
         return List.of();
+    }
+
+    @Transactional
+    public void reviewComment(Long commentContentId) {
+        String commentContent = commentContentService.getById(commentContentId).getContent();
+        CommentReviewResult commentReviewResult = commentReviewAiService.reviewComment(commentContent);
+        CommentReviewResultForDB commentReviewResultForDB = BeanUtil.copyProperties(commentReviewResult, CommentReviewResultForDB.class);
+        commentReviewResultForDB.setCommentId(commentContentId);
+
+        commentReviewResultService.save(commentReviewResultForDB);
+
+        CommentInfo commentInfo = commentInfoService.getById(commentContentId);
+        if (commentReviewResult.getResult().equals("合规")) {
+            commentInfo.setStatus(CommentStatusEnum.APPROVED.getCode());
+            commentInfoService.updateById(commentInfo);
+        } else if (commentReviewResult.getResult().equals("违规")) {
+            commentInfo.setStatus(CommentStatusEnum.REJECTED.getCode());
+            commentInfoService.updateById(commentInfo);
+        } else if (commentReviewResult.getResult().equals("模糊")) {
+            commentInfo.setStatus(CommentStatusEnum.PENDING.getCode());
+            commentInfoService.updateById(commentInfo);
+
+            // 通知人工审核
+            mailService.sendSimpleMail("1508201988@qq.com", "评论需要人工审核", "评论id为" + commentInfo.getId());
+        }
     }
 }
