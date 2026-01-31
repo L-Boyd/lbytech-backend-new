@@ -81,6 +81,12 @@ public class CommentServiceImpl extends ServiceImpl<CommentInfoMapper, CommentIn
     @Override
     @Transactional
     public void deleteComment(Long commentId) {
+        CommentInfo commentInfo = commentInfoService.getById(commentId);
+        UserVO currentUser = UserHolder.getUser();
+        if (!currentUser.getEmail().equals(commentInfo.getUserEmail())) {
+            throw new BusinessException(StatusCodeEnum.UNAUTHORIZED, "用户权限不足");
+        }
+
         // 逻辑删除评论信息
         commentInfoService.deleteCommentInfo(commentId);
 
