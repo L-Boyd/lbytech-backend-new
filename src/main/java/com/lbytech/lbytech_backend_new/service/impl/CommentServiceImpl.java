@@ -75,7 +75,14 @@ public class CommentServiceImpl extends ServiceImpl<CommentInfoMapper, CommentIn
         commentContentService.insertCommentContent(commentContent);
 
         // 评论审核
-        Thread.startVirtualThread(() -> reviewComment(commentContent.getId()));
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        Thread.startVirtualThread(() -> reviewComment(commentContent.getId()));
+                    }
+                }
+        );
     }
 
     @Override
