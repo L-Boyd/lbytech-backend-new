@@ -46,9 +46,6 @@ public class CommentServiceImpl extends ServiceImpl<CommentInfoMapper, CommentIn
     public void addComment(CommentRequest commentRequest) {
         // 获取当前用户
         UserVO currentUser = UserHolder.getUser();
-        if (currentUser == null) {
-            throw new BusinessException(StatusCodeEnum.FAIL, "用户未登录");
-        }
 
         // 创建评论信息
         CommentInfo commentInfo = new CommentInfo();

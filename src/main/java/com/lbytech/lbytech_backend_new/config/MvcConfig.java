@@ -30,7 +30,8 @@ public class MvcConfig implements WebMvcConfigurer {
                         "/notebook/**",
                         "/thumb/**",
                         "/es/**",
-                        "/ai/**"
+                        "/ai/**",
+                        "/comment/**"
                 ).order(1);
 
         // 检测是否有权限上传文件
