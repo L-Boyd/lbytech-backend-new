@@ -23,7 +23,7 @@ public class CommentInfo {
 
     private Integer likeCount; // 点赞数
 
-    private Integer status; // 状态，0：审核中，1：正常，2：禁止查看
+    private Integer status; // 状态，0：审核中，1：正常，2：禁止查看，3：等待人工审核，4：删除
 
     private LocalDateTime createTime; // 创建时间
 

@@ -2,6 +2,7 @@ package com.lbytech.lbytech_backend_new.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lbytech.lbytech_backend_new.mapper.CommentInfoMapper;
+import com.lbytech.lbytech_backend_new.pojo.Enum.CommentStatusEnum;
 import com.lbytech.lbytech_backend_new.pojo.Enum.SoftDeleteStatusEnum;
 import com.lbytech.lbytech_backend_new.pojo.entity.CommentInfo;
 import com.lbytech.lbytech_backend_new.service.ICommentInfoService;
@@ -24,6 +25,7 @@ public class CommentInfoServviceImpl extends ServiceImpl<CommentInfoMapper, Comm
         this.lambdaUpdate()
                 .eq(CommentInfo::getId, commentId)
                 .set(CommentInfo::getIsDeleted, SoftDeleteStatusEnum.DELETED.getCode())
+                .set(CommentInfo::getStatus, CommentStatusEnum.DISABLED.getCode())
                 .update();
     }
 }
