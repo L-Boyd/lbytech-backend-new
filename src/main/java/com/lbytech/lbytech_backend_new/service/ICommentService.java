@@ -1,8 +1,7 @@
 package com.lbytech.lbytech_backend_new.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.lbytech.lbytech_backend_new.pojo.dto.CommentRequest;
-import com.lbytech.lbytech_backend_new.pojo.entity.CommentInfo;
+import com.lbytech.lbytech_backend_new.pojo.vo.CommentVO;
 
 import java.util.List;
 
@@ -28,5 +27,5 @@ public interface ICommentService {
      * @param notebookId 笔记ID
      * @return 评论列表
      */
-    List<CommentInfo> getCommentsByNotebookId(Long notebookId, Integer pageNum, Integer pageSize);
+    List<CommentVO> getCommentPageByNotebookId(Long notebookId, Integer pageNum, Integer pageSize);
 }
