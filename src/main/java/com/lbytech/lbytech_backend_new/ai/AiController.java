@@ -5,7 +5,9 @@ import com.lbytech.lbytech_backend_new.ai.service.aiService.deepseek.DeepseekOrd
 import com.lbytech.lbytech_backend_new.ai.service.aiService.deepseek.DeepseekRAGAiService;
 import com.lbytech.lbytech_backend_new.ai.service.strategy.AiServiceFactory;
 import com.lbytech.lbytech_backend_new.ai.service.strategy.AiServiceStrategy;
+import com.lbytech.lbytech_backend_new.pojo.vo.BaseResponse;
 import com.lbytech.lbytech_backend_new.pojo.vo.UserVO;
+import com.lbytech.lbytech_backend_new.util.ResultUtil;
 import com.lbytech.lbytech_backend_new.util.UserHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,6 +23,9 @@ import reactor.core.publisher.Flux;
 @Tag(name = "AI模块", description = "AI相关API")    // springdoc描述类
 public class AiController {
 
+    @Autowired
+    private MySQLChatMemoryStore mySQLChatMemoryStore;
+
     @PostMapping(value = "/chat", produces = "text/html;charset=UTF-8")
     @Operation(summary = "普通聊天", description = "普通聊天功能")   // springdoc描述方法
     public Flux<String> chat(@RequestBody AiChatRequestForm aiChatRequestForm) {
@@ -35,5 +40,13 @@ public class AiController {
         UserVO user = UserHolder.getUser();
         AiServiceStrategy aiServiceStrategy = AiServiceFactory.getStrategy(aiChatRequestForm.getModel());
         return aiServiceStrategy.chatWithRAG(user.getEmail(), aiChatRequestForm.getMessage());
+    }
+
+    @PostMapping("/deleteMemory")
+    @Operation(summary = "删除记忆", description = "删除记忆功能")   // springdoc描述方法
+    public BaseResponse<Boolean> deleteMemory() {
+        UserVO user = UserHolder.getUser();
+        mySQLChatMemoryStore.deleteMessages(user.getEmail());
+        return ResultUtil.success(true);
     }
 }
